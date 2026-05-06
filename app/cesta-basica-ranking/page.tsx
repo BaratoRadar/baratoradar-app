@@ -7,6 +7,26 @@ type SP = {
   cidade?: string;
 };
 
+function normalizar(texto: string) {
+  return texto
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
+function categoriaProduto(nome: string) {
+  const n = normalizar(nome);
+
+  if (n.includes("arroz")) return "arroz";
+  if (n.includes("feij")) return "feijão";
+  if (n.includes("oleo")) return "óleo";
+  if (n.includes("leite")) return "leite";
+  if (n.includes("acucar")) return "açúcar";
+  if (n.includes("cafe")) return "café";
+
+  return null;
+}
+
 export default async function CestaRankingPage({
   searchParams,
 }: {
@@ -16,13 +36,6 @@ export default async function CestaRankingPage({
   const cidade = (sp?.cidade ?? "").trim();
 
   const products = await prisma.product.findMany({
-    where: {
-      OR: [
-        { category: "Cesta Básica" },
-        { category: "Cesta básica" },
-        { category: "cesta básica" },
-      ],
-    },
     include: {
       offers: {
         where: cidade
@@ -40,44 +53,49 @@ export default async function CestaRankingPage({
     },
   });
 
-  const storeTotals: Record<string, number> = {};
-  const storeItems: Record<string, { product: string; price: number }[]> = {};
+  const storeItems: Record<string, Record<string, number>> = {};
 
   for (const product of products) {
-    const bestByStore: Record<string, number> = {};
+    const categoria = categoriaProduto(product.name);
+    if (!categoria) continue;
 
     for (const offer of product.offers) {
       const store = offer.store.name;
 
-      if (!bestByStore[store] || offer.price < bestByStore[store]) {
-        bestByStore[store] = offer.price;
-      }
-    }
-
-    for (const [store, price] of Object.entries(bestByStore)) {
-      if (!storeTotals[store]) {
-        storeTotals[store] = 0;
-      }
-
       if (!storeItems[store]) {
-        storeItems[store] = [];
+        storeItems[store] = {};
       }
 
-      storeTotals[store] += price;
-      storeItems[store].push({
-        product: product.name,
-        price,
-      });
+      const existente = storeItems[store][categoria];
+
+      if (!existente || offer.price < existente) {
+        storeItems[store][categoria] = offer.price;
+      }
     }
   }
 
-  const ranking = Object.entries(storeTotals)
-    .map(([store, total]) => ({
-      store,
-      total,
-      items: storeItems[store] ?? [],
-    }))
+  const rankingBase = Object.entries(storeItems)
+    .map(([store, categorias]) => {
+      const items = Object.entries(categorias).map(([product, price]) => ({
+        product,
+        price,
+      }));
+
+      const total = items.reduce((sum, item) => sum + item.price, 0);
+
+      return {
+        store,
+        total,
+        items,
+      };
+    })
+    .filter((item) => item.items.length >= 2)
     .sort((a, b) => a.total - b.total);
+
+  const ranking = rankingBase.map((item, index) => ({
+    ...item,
+    diff: index === 0 ? 0 : item.total - rankingBase[0].total,
+  }));
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-10">
@@ -88,11 +106,12 @@ export default async function CestaRankingPage({
           </h1>
 
           <p className="mt-2 text-slate-600">
-            Soma dos menores preços por produto em cada supermercado
+            Menor preço por categoria em cada supermercado
           </p>
 
           <p className="mt-2 text-xs text-slate-500">
-            Cidade selecionada: {cidade || "Todas"} | Produtos encontrados: {products.length} | supermercados: {ranking.length}
+            Cidade selecionada: {cidade || "Todas"} | supermercados:{" "}
+            {ranking.length}
           </p>
         </div>
 
@@ -126,25 +145,44 @@ export default async function CestaRankingPage({
       <div className="mt-8 space-y-6">
         {ranking.map((item, index) => {
           const medal =
-            index === 0 ? "🥇" :
-            index === 1 ? "🥈" :
-            index === 2 ? "🥉" : "🏪";
+            index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : "🏪";
 
           return (
             <div
               key={item.store}
               className="rounded-2xl border bg-white p-5 shadow-sm"
             >
-              <div className="flex items-center justify-between">
-                <div className="text-lg font-semibold text-slate-900">
-                  {medal} {item.store}
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <a
+  href={`/supermercado/${encodeURIComponent(item.store)}`}
+  className="text-lg font-semibold text-slate-900 hover:underline"
+>
+  {medal} {item.store}
+</a>
+                  <p className="mt-2 text-xs text-slate-500">
+                    Itens considerados: {item.items.length}
+                  </p>
                 </div>
 
-                <div className="text-2xl font-bold text-green-700">
-                  {item.total.toLocaleString("pt-BR", {
-                    style: "currency",
-                    currency: "BRL",
-                  })}
+                <div className="text-right">
+                  <div className="text-2xl font-bold text-green-700">
+                    {item.total.toLocaleString("pt-BR", {
+                      style: "currency",
+                      currency: "BRL",
+                    })}
+                  </div>
+
+                  {item.diff > 0 && (
+                    <p className="mt-1 text-sm text-red-500">
+                      +
+                      {item.diff.toLocaleString("pt-BR", {
+                        style: "currency",
+                        currency: "BRL",
+                      })}{" "}
+                      mais caro que o 1º
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -152,16 +190,18 @@ export default async function CestaRankingPage({
                 <table className="w-full text-left text-sm">
                   <thead className="bg-slate-50 text-slate-700">
                     <tr>
-                      <th className="px-4 py-3">Produto</th>
+                      <th className="px-4 py-3">Categoria</th>
                       <th className="px-4 py-3">Menor preço</th>
                     </tr>
                   </thead>
+
                   <tbody>
                     {item.items.map((p) => (
                       <tr key={`${item.store}-${p.product}`} className="border-t">
                         <td className="px-4 py-3 font-medium text-slate-900">
                           {p.product}
                         </td>
+
                         <td className="px-4 py-3 font-bold text-green-700">
                           {p.price.toLocaleString("pt-BR", {
                             style: "currency",
@@ -178,11 +218,25 @@ export default async function CestaRankingPage({
         })}
 
         {ranking.length === 0 && (
-          <div className="rounded-2xl border bg-white p-6 text-slate-600 shadow-sm">
-            Nenhum dado disponível para cesta básica nessa cidade.
-          </div>
-        )}
-      </div>
-    </main>
-  );
+  <div className="rounded-2xl border bg-white p-6 text-slate-600 shadow-sm">
+    Nenhum dado disponível para cesta básica nessa cidade.
+  </div>
+)}
+
+{/* DISCLAIMER */}
+<div className="mt-10 text-xs text-slate-500 space-y-1">
+  <p>
+    * Os preços são coletados automaticamente de fontes públicas e podem sofrer alterações sem aviso prévio.
+  </p>
+  <p>
+    * O BaratoRadar não garante disponibilidade de estoque nas lojas.
+  </p>
+  <p>
+    * As ofertas podem variar por cidade, região, loja física ou canal online.
+  </p>
+</div>
+
+</div>
+</main>
+);
 }

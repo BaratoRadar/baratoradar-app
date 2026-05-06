@@ -6,7 +6,18 @@ import { prisma } from "@/lib/prisma";
 type SP = {
   cidade?: string;
 };
+function categoriaProduto(nome: string) {
+  const n = nome.toLowerCase();
 
+  if (n.includes("arroz")) return "arroz";
+  if (n.includes("feij")) return "feijão";
+  if (n.includes("oleo") || n.includes("óleo")) return "óleo";
+  if (n.includes("leite")) return "leite";
+  if (n.includes("acucar") || n.includes("açúcar")) return "açúcar";
+  if (n.includes("cafe") || n.includes("café")) return "café";
+
+  return null;
+}
 export default async function CestaRankingPage({
   searchParams,
 }: {
@@ -16,13 +27,6 @@ export default async function CestaRankingPage({
   const cidade = (sp?.cidade ?? "").trim();
 
   const products = await prisma.product.findMany({
-    where: {
-      OR: [
-        { category: "Cesta Básica" },
-        { category: "Cesta básica" },
-        { category: "cesta básica" },
-      ],
-    },
     include: {
       offers: {
         where: cidade
@@ -41,9 +45,11 @@ export default async function CestaRankingPage({
   });
 
   const storeTotals: Record<string, number> = {};
-  const storeItems: Record<string, { product: string; price: number }[]> = {};
+const storeItems: Record<string, Record<string, number>> = {};
 
   for (const product of products) {
+    const categoria = categoriaProduto(product.name);
+if (!categoria) continue;
     const bestByStore: Record<string, number> = {};
 
     for (const offer of product.offers) {
@@ -55,29 +61,30 @@ export default async function CestaRankingPage({
     }
 
     for (const [store, price] of Object.entries(bestByStore)) {
-      if (!storeTotals[store]) {
-        storeTotals[store] = 0;
-      }
+  if (!storeItems[store]) {
+    storeItems[store] = {};
+  }
 
-      if (!storeItems[store]) {
-        storeItems[store] = [];
-      }
+  const categoria = categoriaProduto(product.name);
+  if (!categoria) continue;
 
-      storeTotals[store] += price;
-      storeItems[store].push({
-        product: product.name,
-        price,
-      });
+  const existente = storeItems[store][categoria];
+
+  if (!existente || price < existente) {
+    storeItems[store][categoria] = price;
+  }
+}
+
     }
   }
 
   const ranking = Object.entries(storeTotals)
-    .map(([store, total]) => ({
-      store,
-      total,
-      items: storeItems[store] ?? [],
-    }))
-    .sort((a, b) => a.total - b.total);
+  .map(([store, total]) => ({
+    store,
+    total,
+    items: storeItems[store] ?? [],
+  }))
+  .filter((item) => item.items.length >= 4) // 👈 A
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-10">

@@ -2,14 +2,16 @@
   "name": "baratoradar-app",
   "version": "0.1.0",
   "private": true,
-"scripts": {
-  "dev": "next dev",
-  "build": "next build",
-  "start": "next start",
-  "lint": "eslint",
-  "scrape:zaffari": "tsx scripts/scrapers/zaffari.ts"
-},
-"prisma": {
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "scrape:zaffari": "tsx scripts/scrapers/zaffari.ts",
+    "scrape:carrefour": "tsx scripts/scrapers/carrefour.ts",
+    "import:offers": "tsx scripts/import-offers.ts"
+  },
+  "prisma": {
     "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
