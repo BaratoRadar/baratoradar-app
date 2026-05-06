@@ -126,7 +126,7 @@ export default async function CestaRankingPage({
             <option value="Canoas">Canoas</option>
             <option value="Novo Hamburgo">Novo Hamburgo</option>
             <option value="São Leopoldo">São Leopoldo</option>
-            <option value="Gravataí">Gravataí</option>
+            <option value="São Paulo">São Paulo</option>
           </select>
 
           <button className="rounded-xl bg-green-700 px-4 py-2 text-sm font-semibold text-white hover:bg-green-800">
@@ -155,11 +155,12 @@ export default async function CestaRankingPage({
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <a
-  href={`/supermercado/${encodeURIComponent(item.store)}`}
-  className="text-lg font-semibold text-slate-900 hover:underline"
->
-  {medal} {item.store}
-</a>
+                    href={`/supermercado/${encodeURIComponent(item.store)}`}
+                    className="text-lg font-semibold text-slate-900 hover:underline"
+                  >
+                    {medal} {item.store}
+                  </a>
+
                   <p className="mt-2 text-xs text-slate-500">
                     Itens considerados: {item.items.length}
                   </p>
@@ -218,25 +219,23 @@ export default async function CestaRankingPage({
         })}
 
         {ranking.length === 0 && (
-  <div className="rounded-2xl border bg-white p-6 text-slate-600 shadow-sm">
-    Nenhum dado disponível para cesta básica nessa cidade.
-  </div>
-)}
+          <div className="rounded-2xl border bg-white p-6 text-slate-600 shadow-sm">
+            Nenhum dado disponível para cesta básica nessa cidade.
+          </div>
+        )}
 
-{/* DISCLAIMER */}
-<div className="mt-10 text-xs text-slate-500 space-y-1">
-  <p>
-    * Os preços são coletados automaticamente de fontes públicas e podem sofrer alterações sem aviso prévio.
-  </p>
-  <p>
-    * O BaratoRadar não garante disponibilidade de estoque nas lojas.
-  </p>
-  <p>
-    * As ofertas podem variar por cidade, região, loja física ou canal online.
-  </p>
-</div>
-
-</div>
-</main>
-);
+        <div className="mt-10 text-xs text-slate-500 space-y-1">
+          <p>
+            * Os preços são coletados automaticamente de fontes públicas e podem sofrer alterações sem aviso prévio.
+          </p>
+          <p>
+            * O BaratoRadar não garante disponibilidade de estoque nas lojas.
+          </p>
+          <p>
+            * As ofertas podem variar por cidade, região, loja física ou canal online.
+          </p>
+        </div>
+      </div>
+    </main>
+  );
 }
