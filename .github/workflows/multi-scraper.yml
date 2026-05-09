@@ -1,0 +1,64 @@
+workflow_dispatch:
+      - name: Instalar dependências
+        run: npm install
+
+      - name: Gerar Prisma Client
+        run: npx prisma generate
+
+      - name: Rodar scraper Zaffari
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          NODE_TLS_REJECT_UNAUTHORIZED: "0"
+        run: npm run scrape:zaffari
+
+  carrefour:
+    name: Scraper Carrefour
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@v4
+
+      - name: Instalar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Instalar dependências
+        run: npm install
+
+      - name: Gerar Prisma Client
+        run: npx prisma generate
+
+      - name: Rodar scraper Carrefour
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          NODE_TLS_REJECT_UNAUTHORIZED: "0"
+        run: npm run scrape:carrefour
+
+  assai:
+    name: Scraper Assai
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@v4
+
+      - name: Instalar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Instalar dependências
+        run: npm install
+
+      - name: Gerar Prisma Client
+        run: npx prisma generate
+
+      - name: Rodar scraper Assai
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          NODE_TLS_REJECT_UNAUTHORIZED: "0"
+        run: npm run scrape:assai
