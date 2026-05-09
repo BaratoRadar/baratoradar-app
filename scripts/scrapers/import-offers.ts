@@ -70,14 +70,20 @@ if (!store) {
   });
 }
 
-    const product = await prisma.product.upsert({
-      where: { name: o.productName },
-      update: {},
-      create: {
-        name: o.productName,
-        category: o.category,
-      },
-    });
+    let product = await prisma.product.findFirst({
+  where: {
+    name: o.productName,
+  },
+});
+
+if (!product) {
+  product = await prisma.product.create({
+    data: {
+      name: o.productName,
+      category: o.category,
+    },
+  });
+}
 
     await prisma.offer.create({
       data: {
