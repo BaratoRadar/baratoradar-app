@@ -1,4 +1,4 @@
-import "dotenv/config";
+
 import * as cheerio from "cheerio";
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
