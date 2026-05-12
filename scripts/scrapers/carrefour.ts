@@ -1,32 +1,8 @@
 import "dotenv/config";
 import { PrismaClient } from "@prisma/client";
-import { PrismaPg } from "@prisma/adapter-pg";
-import { Pool } from "pg";
 
-const rawConnectionString = process.env.DATABASE_URL;
+const prisma = new PrismaClient();
 
-if (!rawConnectionString) {
-  throw new Error("DATABASE_URL não encontrada no .env");
-}
-
-function sanitizeDatabaseUrl(url: string): string {
-  return url
-    .replace(/([?&])sslmode=[^&]*/g, "$1")
-    .replace(/([?&])pgbouncer=true/g, "$1")
-    .replace(/([?&])uselibpqcompat=true/g, "$1")
-    .replace(/\?&/, "?")
-    .replace(/&&/g, "&")
-    .replace(/[?&]$/, "");
-}
-
-const connectionString = sanitizeDatabaseUrl(rawConnectionString);
-
-const pool = new Pool({
-  connectionString,
-  ssl: {
-    rejectUnauthorized: false,
-  },
-});
 
 const prisma = new PrismaClient({
   adapter: new PrismaPg(pool),
