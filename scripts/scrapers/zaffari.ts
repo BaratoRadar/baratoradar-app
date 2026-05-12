@@ -1,8 +1,7 @@
 
 import * as cheerio from "cheerio";
 import { PrismaClient } from "@prisma/client";
-import { PrismaPg } from "@prisma/adapter-pg";
-import { Pool } from "pg";
+
 
 const rawConnectionString = process.env.DATABASE_URL;
 if (!rawConnectionString) {
@@ -28,9 +27,7 @@ const pool = new Pool({
   },
 });
 
-const prisma = new PrismaClient({
-  adapter: new PrismaPg(pool),
-});
+const prisma = new PrismaClient();
 
 type ParsedOffer = {
   productName: string;
