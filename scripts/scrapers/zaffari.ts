@@ -4,8 +4,10 @@ import { PrismaClient } from "@prisma/client";
 
 
 const rawConnectionString = process.env.DATABASE_URL;
+const prisma = new PrismaClient();
 if (!rawConnectionString) {
-  throw new Error("DATABASE_URL não encontrada no .env");
+  console.error("DATABASE_URL não encontrada");
+  process.exit(1);
 }
 
 function sanitizeDatabaseUrl(url: string): string {
@@ -20,14 +22,8 @@ function sanitizeDatabaseUrl(url: string): string {
 
 const connectionString = sanitizeDatabaseUrl(rawConnectionString);
 
-const pool = new Pool({
-  connectionString,
-  ssl: {
-    rejectUnauthorized: false,
-  },
-});
 
-const prisma = new PrismaClient();
+
 
 type ParsedOffer = {
   productName: string;
@@ -257,5 +253,5 @@ main()
   })
   .finally(async () => {
     await prisma.$disconnect();
-    await pool.end();
+    ;
   });
