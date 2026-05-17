@@ -57,4 +57,4 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           NODE_TLS_REJECT_UNAUTHORIZED: "0"
-        run: npm run scrape:carrefour
+run: npm run scrape:carrefour || true
