@@ -1,21 +1,14 @@
 import "dotenv/config";
 import { PrismaClient } from "@prisma/client";
-import { PrismaPg } from "@prisma/adapter-pg";
-import { Pool } from "pg";
+
 
 const connectionString = process.env.DATABASE_URL;
+const prisma = new PrismaClient();
 if (!connectionString) {
   throw new Error("DATABASE_URL não encontrada no .env");
 }
 
-const pool = new Pool({
-  connectionString,
-  ssl: { rejectUnauthorized: false },
-});
 
-const prisma = new PrismaClient({
-  adapter: new PrismaPg(pool),
-});
 
 async function main() {
   // Lojas
@@ -122,5 +115,5 @@ main()
   })
   .finally(async () => {
     await prisma.$disconnect();
-    await pool.end();
+    
   });
