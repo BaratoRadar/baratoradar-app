@@ -2,8 +2,6 @@ import "dotenv/config";
 import fs from "fs";
 import path from "path";
 import { PrismaClient } from "@prisma/client";
-import { PrismaPg } from "@prisma/adapter-pg";
-import { Pool } from "pg";
 
 console.log("SCRIPT INICIADO");
 
@@ -13,14 +11,8 @@ if (!rawConnectionString) {
   throw new Error("DATABASE_URL não encontrada no .env");
 }
 
-const pool = new Pool({
-  connectionString: rawConnectionString,
-  ssl: { rejectUnauthorized: false },
-});
 
-const prisma = new PrismaClient({
-  adapter: new PrismaPg(pool),
-});
+const prisma = new PrismaClient();
 
 function readCsv() {
   const filePath = path.join(process.cwd(), "data", "ofertas_sp.csv");
@@ -105,5 +97,4 @@ main()
   .catch(console.error)
   .finally(async () => {
     await prisma.$disconnect();
-    await pool.end();
   });
