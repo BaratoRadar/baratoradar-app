@@ -15,8 +15,8 @@ export default function RootLayout({
     <html lang="pt-BR">
       <body className="bg-white text-slate-900">
   <div className="bg-yellow-100 border-b border-yellow-300 text-center py-2 text-sm text-gray-800">
-    BaratoRadar está em sua versão inicial de lançamento. Estamos expandindo continuamente a cobertura de ofertas, regiões e funcionalidades para oferecer a melhor experiência aos consumidores.
-  </div>
+  🚧 Em teste — BaratoRadar está em sua versão inicial de lançamento. Estamos expandindo continuamente a cobertura de ofertas, regiões e funcionalidades para oferecer a melhor experiência aos consumidores.
+</div>
 
   <Header />
   {children}
