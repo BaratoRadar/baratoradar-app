@@ -80,30 +80,7 @@ const atacadao = await prisma.store.create({
   }),
 ]);
 
-  // Limpa ofertas antigas para não duplicar
-  await prisma.offer.deleteMany();
-
-  // Ofertas
-  await prisma.offer.createMany({
-    data: [
-      { productId: frango.id, storeId: atacadao.id, price: 8.99, unit: "kg", region: "Zona Norte" },
-      { productId: frango.id, storeId: zaffari.id, price: 9.49, unit: "kg", region: "Centro" },
-      { productId: patinho.id, storeId: carrefour.id, price: 29.9, unit: "kg", region: "Zona Norte" },
-      { productId: linguica.id, storeId: atacadao.id, price: 12.9, unit: "kg", region: "Zona Sul" },
-      { productId: ovos.id, storeId: carrefour.id, price: 9.9, unit: "dúzia", region: "Centro" },
-
-      { productId: arroz.id, storeId: atacadao.id, price: 24.9, unit: "5kg", region: "Zona Norte" },
-      { productId: feijao.id, storeId: zaffari.id, price: 7.49, unit: "1kg", region: "Centro" },
-      { productId: macarrao.id, storeId: carrefour.id, price: 3.99, unit: "500g", region: "Zona Norte" },
-      { productId: ervaMate.id, storeId: zaffari.id, price: 15.9, unit: "kg", region: "Centro" },
-      { productId: cafe.id, storeId: carrefour.id, price: 13.5, unit: "500g", region: "Zona Sul" },
-
-      { productId: sabao.id, storeId: atacadao.id, price: 8.99, unit: "kg", region: "Zona Norte" },
-      { productId: detergente.id, storeId: carrefour.id, price: 2.49, unit: "500ml", region: "Centro" },
-      { productId: aguaSanitaria.id, storeId: atacadao.id, price: 3.19, unit: "1L", region: "Zona Norte" },
-      { productId: desinfetante.id, storeId: zaffari.id, price: 4.99, unit: "500ml", region: "Zona Sul" },
-    ],
-  });
+  
 
   console.log("Seed concluído com sucesso!");
 }
