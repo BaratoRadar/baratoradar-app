@@ -16,7 +16,7 @@ export default function Header() {
           <img
   src="/logo.png"
   alt="BaratoRadar"
-  className="h-12 w-auto"
+  className="h-14 w-auto object-contain"
 />
           </div>
           <div>
