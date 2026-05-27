@@ -13,11 +13,13 @@ export default function Header() {
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
         <Link href="/" className="flex items-center gap-3">
           <div className="grid h-10 w-10 place-items-center rounded-xl bg-green-700 text-white font-bold">
-          <img
-  src="/logo.png"
-  alt="BaratoRadar"
-  className="h-14 w-auto object-contain"
-/>
+          <div className="flex items-center">
+  <img
+    src="/logo.png"
+    alt="BaratoRadar"
+    style={{ height: "50px", width: "auto" }}
+  />
+</div>
           </div>
           <div>
             <div className="text-lg font-extrabold text-slate-900">BaratoRadar</div>
