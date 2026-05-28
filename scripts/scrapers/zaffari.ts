@@ -174,6 +174,12 @@ async function offerAlreadyExists(params: {
   city: string;
   region: string;
 }) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+
   const existing = await prisma.offer.findFirst({
     where: {
       productId: params.productId,
@@ -181,6 +187,10 @@ async function offerAlreadyExists(params: {
       price: params.price,
       city: params.city,
       region: params.region,
+      createdAt: {
+        gte: today,
+        lt: tomorrow,
+      },
     },
   });
 
