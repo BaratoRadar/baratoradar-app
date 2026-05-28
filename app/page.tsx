@@ -140,72 +140,21 @@ export default async function HomePage({
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-10">
-      <section className="rounded-3xl border bg-gradient-to-br from-green-50 to-white p-8 shadow-sm">
-        <h1 className="text-4xl font-extrabold text-slate-900">
-          BaratoRadar
-        </h1>
+      <section className="rounded-3xl bg-gradient-to-r from-slate-900 to-emerald-900 text-white p-8 md:p-12 shadow-xl mb-8">
+  <div className="max-w-3xl">
+    <p className="uppercase tracking-widest text-emerald-300 text-xs font-bold mb-3">
+      Plataforma em teste
+    </p>
 
-        <p className="mt-3 max-w-2xl text-slate-600">
-          Compare preços de supermercados e acompanhe as melhores ofertas,
-          a cesta básica mais barata e os destaques por cidade e região.
-        </p>
+    <h1 className="text-4xl md:text-6xl font-black leading-tight">
+      Compare ofertas e encontre os melhores preços.
+    </h1>
 
-        <form method="get" className="mt-6 flex flex-wrap gap-3">
-          <select
-            name="cidade"
-            defaultValue={cidade}
-            className="rounded-xl border px-4 py-3 text-sm font-semibold text-slate-700"
-          >
-            <option value="">Todas as cidades</option>
-            <option value="Porto Alegre">Porto Alegre</option>
-            <option value="Canoas">Canoas</option>
-            <option value="Novo Hamburgo">Novo Hamburgo</option>
-            <option value="São Leopoldo">São Leopoldo</option>
-            <option value="Gravataí">Gravataí</option>
-          </select>
-
-          <button
-            type="submit"
-            className="rounded-xl bg-green-700 px-5 py-3 text-sm font-semibold text-white hover:bg-green-800"
-          >
-            Filtrar cidade
-          </button>
-
-          <a
-            href="/"
-            className="rounded-xl border px-5 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50"
-          >
-            Limpar
-          </a>
-        </form>
-
-        <div className="mt-4 text-xs text-slate-500">
-          Cidade selecionada: {cidade || "Todas"}
-        </div>
-
-        <div className="mt-6 flex flex-wrap gap-3">
-          <Link
-            href="/ofertas"
-            className="rounded-xl bg-green-700 px-5 py-3 text-sm font-semibold text-white hover:bg-green-800"
-          >
-            Ver ofertas
-          </Link>
-
-          <Link
-            href="/cesta-basica-ranking"
-            className="rounded-xl border px-5 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50"
-          >
-            Ranking da cesta
-          </Link>
-
-          <Link
-            href="/cesta-basica-regiao"
-            className="rounded-xl border px-5 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50"
-          >
-            Ranking por região
-          </Link>
-        </div>
-      </section>
+    <p className="mt-5 text-slate-200 text-lg">
+      Proteínas, cesta básica e supermercados monitorados em tempo real.
+    </p>
+  </div>
+</section>
 
       {maisBaratoCidade && (
         <section className="mt-10 rounded-3xl border bg-white p-6 shadow-sm">
