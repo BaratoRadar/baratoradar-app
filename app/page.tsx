@@ -300,10 +300,9 @@ export default async function HomePage({
             <div className="mt-3 text-lg font-bold text-slate-900">
               Proteínas
             </div>
-            <div className="mt-2 text-sm text-slate-500">
-            </div>
-              Frango, ovos, carne bovina e mais.
-            </p>
+            <p className="mt-2 text-sm text-slate-500">
+  Frango, ovos, carne bovina e mais.
+</p>
           </Link>
 
           <Link
