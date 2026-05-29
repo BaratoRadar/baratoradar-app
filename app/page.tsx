@@ -157,7 +157,10 @@ export default async function HomePage({
 </section>
 
       {maisBaratoCidade && (
-        <section className="mt-10 rounded-3xl border-4 border-yellow-400 bg-yellow-50 p-6 shadow-2xl">
+        <section
+  className="mt-10 rounded-3xl bg-white p-6 shadow-2xl"
+  style={{ border: "4px solid #facc15" }}
+>
           <div className="inline-flex items-center rounded-full bg-orange-100 px-3 py-1 text-xs font-bold text-orange-700">
             🥇 MAIS BARATO {cidade ? `EM ${cidade.toUpperCase()}` : "DA CIDADE"}
           </div>
@@ -180,7 +183,10 @@ export default async function HomePage({
       )}
 
       {melhorOferta && (
-       <section className="mt-8 rounded-3xl border-4 border-orange-400 bg-orange-50 p-6 shadow-2xl">
+       <section
+  className="mt-8 rounded-3xl bg-white p-6 shadow-2xl"
+  style={{ border: "4px solid #fb923c" }}
+>
           <div className="inline-flex items-center rounded-full bg-orange-100 px-3 py-1 text-xs font-bold text-orange-700">
             🔥 MELHOR OFERTA DO DIA
           </div>
