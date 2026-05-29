@@ -155,7 +155,7 @@ export default async function HomePage({
     </p>
   </div>
 </section>
-
+<div className="mt-10 grid gap-6 md:grid-cols-2">
       {maisBaratoCidade && (
         <section
   className="mt-10 rounded-3xl bg-white p-6 shadow-2xl"
@@ -179,6 +179,7 @@ export default async function HomePage({
           <p className="mt-2 text-sm text-slate-500">
   Menor valor da cesta básica entre os supermercados cadastrados.
 </p>
+
         </section>
       )}
 
@@ -205,7 +206,9 @@ export default async function HomePage({
         </section>
       )}
 
-      <section className="mt-12">
+</div>
+
+<section className="mt-12">
         <div className="flex items-end justify-between">
           <h2 className="text-2xl font-bold text-slate-900">
             📍 Mais barato por região
