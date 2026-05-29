@@ -157,8 +157,8 @@ export default async function HomePage({
 </section>
 
       {maisBaratoCidade && (
-        <section className="mt-10 rounded-3xl border border-yellow-200 bg-gradient-to-br from-yellow-50 to-white p-6 shadow-lg transition-all hover:shadow-xl">
-          <div className="text-xs font-semibold text-orange-600">
+        <section className="mt-10 rounded-3xl border-4 border-yellow-400 bg-yellow-50 p-6 shadow-2xl">
+          <div className="inline-flex items-center rounded-full bg-orange-100 px-3 py-1 text-xs font-bold text-orange-700">
             🥇 MAIS BARATO {cidade ? `EM ${cidade.toUpperCase()}` : "DA CIDADE"}
           </div>
 
@@ -166,7 +166,7 @@ export default async function HomePage({
             {maisBaratoCidade.store}
           </div>
 
-          <div className="mt-3 text-3xl font-extrabold text-green-700">
+          <div className="mt-3 text-5xl font-black text-emerald-600">
             {maisBaratoCidade.total.toLocaleString("pt-BR", {
               style: "currency",
               currency: "BRL",
@@ -180,8 +180,8 @@ export default async function HomePage({
       )}
 
       {melhorOferta && (
-        <section className="mt-8 rounded-3xl border bg-white p-6 shadow-sm">
-          <div className="text-xs font-semibold text-orange-600">
+       <section className="mt-8 rounded-3xl border-4 border-orange-400 bg-orange-50 p-6 shadow-2xl">
+          <div className="inline-flex items-center rounded-full bg-orange-100 px-3 py-1 text-xs font-bold text-orange-700">
             🔥 MELHOR OFERTA DO DIA
           </div>
 
@@ -195,13 +195,7 @@ export default async function HomePage({
     currency: "BRL",
   })}
 </div>
-
-          <div className="mt-3 text-5xl font-black text-emerald-600">
-  {melhorOferta.price.toLocaleString("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  })}
-</div>
+          
         </section>
       )}
 
@@ -306,7 +300,8 @@ export default async function HomePage({
             <div className="mt-3 text-lg font-bold text-slate-900">
               Proteínas
             </div>
-            <p className="mt-1 text-sm text-slate-600">
+            <div className="mt-2 text-sm text-slate-500">
+            </div>
               Frango, ovos, carne bovina e mais.
             </p>
           </Link>

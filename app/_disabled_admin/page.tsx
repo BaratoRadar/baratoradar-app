@@ -82,7 +82,7 @@ export default async function AdminPage({
 
       <form
         action={createOffer}
-        className="mt-8 space-y-5 rounded-2xl border bg-white p-6 shadow-sm"
+        className="mt-8 space-y-5 rounded-3xl border-4 border-orange-400 bg-orange-50 p-6 shadow-2xl"
       >
         <div>
           <label className="mb-2 block text-sm font-semibold">Produto</label>
