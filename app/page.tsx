@@ -173,9 +173,9 @@ export default async function HomePage({
             })}
           </div>
 
-          className="mt-2 text-sm text-slate-500"
-            Menor valor da cesta básica entre os supermercados cadastrados.
-          </p>
+          <p className="mt-2 text-sm text-slate-500">
+  Menor valor da cesta básica entre os supermercados cadastrados.
+</p>
         </section>
       )}
 
@@ -189,17 +189,19 @@ export default async function HomePage({
             {melhorOferta.product.name}
           </div>
 
-          <div className="mt-1 text-sm text-slate-600">
-            {melhorOferta.store.name} • {melhorOferta.city ?? "Sem cidade"} •{" "}
-            {melhorOferta.region ?? "Sem região"}
-          </div>
+          <div className="mt-3 text-5xl font-black text-emerald-600">
+  {melhorOferta.price.toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  })}
+</div>
 
-          className="mt-3 text-5xl font-black text-emerald-600"
-            {melhorOferta.price.toLocaleString("pt-BR", {
-              style: "currency",
-              currency: "BRL",
-            })}
-          </div>
+          <div className="mt-3 text-5xl font-black text-emerald-600">
+  {melhorOferta.price.toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  })}
+</div>
         </section>
       )}
 
