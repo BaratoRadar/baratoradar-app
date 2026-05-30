@@ -155,7 +155,7 @@ export default async function HomePage({
     </p>
   </div>
 </section>
-<div className="mt-10 grid gap-6 md:grid-cols-2">
+<div className="mt-10 space-y-6">
       {maisBaratoCidade && (
         <section
   className="rounded-3xl bg-white p-6 shadow-2xl"
