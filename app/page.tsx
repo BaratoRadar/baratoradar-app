@@ -158,7 +158,7 @@ export default async function HomePage({
 <div className="mt-10 grid gap-6 md:grid-cols-2">
       {maisBaratoCidade && (
         <section
-  className="mt-10 rounded-3xl bg-white p-6 shadow-2xl"
+  className="rounded-3xl bg-white p-6 shadow-2xl"
   style={{ border: "4px solid #facc15" }}
 >
           <div className="inline-flex items-center rounded-full bg-orange-100 px-3 py-1 text-xs font-bold text-orange-700">
@@ -185,7 +185,7 @@ export default async function HomePage({
 
       {melhorOferta && (
        <section
-  className="mt-8 rounded-3xl bg-white p-6 shadow-2xl"
+  className="rounded-3xl bg-white p-6 shadow-2xl"
   style={{ border: "4px solid #fb923c" }}
 >
           <div className="inline-flex items-center rounded-full bg-orange-100 px-3 py-1 text-xs font-bold text-orange-700">
