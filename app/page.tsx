@@ -216,7 +216,7 @@ export default async function HomePage({
 
           <Link
             href="/cesta-basica-regiao"
-            className="text-sm font-semibold text-green-700 hover:text-green-800"
+            className="rounded-full bg-sky-100 px-3 py-1 text-sm font-bold text-sky-700 hover:bg-sky-200"
           >
             Ver completo
           </Link>
