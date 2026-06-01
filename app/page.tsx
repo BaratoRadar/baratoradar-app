@@ -224,26 +224,26 @@ export default async function HomePage({
 
         <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {rankingPorRegiao.map((item) => (
-            <div
-              key={item.region}
-              className="rounded-2xl border bg-white p-5 shadow-sm"
-            >
-              <div className="text-sm font-semibold text-slate-500">
-                {item.region}
-              </div>
+  <div
+    key={item.region}
+    className="rounded-3xl border border-sky-200 bg-gradient-to-br from-sky-50 to-white p-5 shadow-lg transition-all hover:-translate-y-1 hover:shadow-xl"
+  >
+    <div className="inline-flex items-center rounded-full bg-sky-100 px-3 py-1 text-xs font-bold text-sky-700">
+      {item.region}
+    </div>
 
-              <div className="mt-2 text-lg font-bold text-slate-900">
-                {item.winner?.store}
-              </div>
+    <div className="mt-2 text-lg font-bold text-slate-900">
+      {item.winner?.store}
+    </div>
 
-              <div className="mt-2 text-2xl font-extrabold text-green-700">
-                {item.winner?.total.toLocaleString("pt-BR", {
-                  style: "currency",
-                  currency: "BRL",
-                })}
-              </div>
-            </div>
-          ))}
+    <div className="mt-2 text-2xl font-extrabold text-green-700">
+      {item.winner?.total.toLocaleString("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+      })}
+    </div>
+  </div>
+))}
 
           {rankingPorRegiao.length === 0 && (
             <div className="rounded-2xl border bg-white p-5 text-slate-600 shadow-sm">
