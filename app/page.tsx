@@ -177,7 +177,7 @@ export default async function HomePage({
           </div>
 
           <p className="mt-2 text-sm text-slate-500">
-  Menor valor da cesta básica entre os supermercados cadastrados.
+  Menor preço em item da cesta básica entre os supermercados cadastrados.
 </p>
 
         </section>
