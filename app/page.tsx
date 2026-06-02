@@ -271,7 +271,7 @@ export default async function HomePage({
           {offers.map((o) => (
             <div
               key={o.id}
-              className="rounded-3xl border border-slate-200 bg-white p-5 shadow-lg transition-all hover:-translate-y-1 hover:shadow-xl"
+              className="rounded-3xl border border-slate-200 bg-white p-5 shadow-md transition-all duration-200 hover:-translate-y-1 hover:shadow-2xl"
             >
               <div className="text-xs font-semibold text-slate-500">
                 <span className="inline-flex rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-700">
@@ -279,21 +279,21 @@ export default async function HomePage({
 </span>
               </div>
 
-              <div className="mt-1 text-lg font-bold text-slate-900">
+              <div className="mt-2 text-lg leading-snug font-bold text-slate-900">
                 {o.product.name}
               </div>
 
-              <div className="mt-1 text-sm text-slate-600">
+              <div className="mt-2 text-xs text-slate-500">
                 {o.store.name} • {o.city ?? "Sem cidade"} •{" "}
                 {o.region ?? "Sem região"}
               </div>
 
               <div className="mt-3 text-3xl font-black text-emerald-600">
-  {o.price.toLocaleString("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  })}
-</div>
+                {o.price.toLocaleString("pt-BR", {
+                  style: "currency",
+                  currency: "BRL",
+                })}
+              </div>
             </div>
           ))}
         </div>
