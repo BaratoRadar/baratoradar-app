@@ -139,7 +139,7 @@ export default async function HomePage({
   const melhorOferta = offers[0] ?? null;
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-10">
+    <main className="mx-auto max-w-6xl px-4 py-10 space-y-10">
       <section className="rounded-3xl bg-gradient-to-r from-slate-900 to-emerald-900 text-white p-8 md:p-12 shadow-xl mb-8">
   <div className="max-w-3xl">
     <p className="uppercase tracking-widest text-emerald-300 text-xs font-bold mb-3">
