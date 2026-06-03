@@ -155,6 +155,37 @@ export default async function HomePage({
     </p>
   </div>
 </section>
+<form method="get" className="rounded-3xl border border-slate-200 bg-white p-5 shadow-lg">
+  <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+    <div>
+      <div className="text-sm font-bold text-slate-900">
+        Escolha sua cidade
+      </div>
+      <p className="text-sm text-slate-500">
+        Veja ofertas, rankings e melhores preços por localidade.
+      </p>
+    </div>
+
+    <div className="flex flex-col gap-3 sm:flex-row">
+      <select
+        name="cidade"
+        defaultValue={cidade}
+        className="rounded-xl border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-700"
+      >
+        <option value="">Todas as cidades</option>
+        <option value="Porto Alegre">Porto Alegre</option>
+        <option value="São Paulo">São Paulo</option>
+      </select>
+
+      <button
+        type="submit"
+        className="rounded-xl bg-emerald-600 px-5 py-3 text-sm font-bold text-white hover:bg-emerald-700"
+      >
+        Aplicar
+      </button>
+    </div>
+  </div>
+</form>
 <div className="mt-10 space-y-6">
       {maisBaratoCidade && (
         <section
