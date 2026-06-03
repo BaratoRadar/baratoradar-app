@@ -208,7 +208,7 @@ export default async function HomePage({
 
 </div>
 
-<section className="mt-12">
+<section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-xl">
         <div className="flex items-end justify-between">
           <h2 className="text-2xl font-bold text-slate-900">
             📍 Mais barato por região

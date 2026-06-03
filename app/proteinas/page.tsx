@@ -67,7 +67,9 @@ export default async function ProteinasPage({
             defaultValue={regiao}
             className="rounded-xl border px-4 py-2 text-sm"
           >
-            <option value="">Toda Porto Alegre</option>
+            <option value="">Todas as cidades</option>
+            <option value="Porto Alegre">Porto Alegre</option>
+            <option value="São Paulo">São Paulo</option>
             <option value="Centro">Centro</option>
             <option value="Zona Norte">Zona Norte</option>
             <option value="Zona Sul">Zona Sul</option>

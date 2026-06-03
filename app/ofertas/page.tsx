@@ -88,6 +88,7 @@ export default async function OfertasPage({
         >
           <option value="">Todas as cidades</option>
           <option value="Porto Alegre">Porto Alegre</option>
+          <option value="São Paulo">São Paulo</option>
           <option value="Canoas">Canoas</option>
           <option value="Novo Hamburgo">Novo Hamburgo</option>
           <option value="São Leopoldo">São Leopoldo</option>
