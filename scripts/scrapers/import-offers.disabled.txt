@@ -1,17 +1,4 @@
-import "dotenv/config";
-import fs from "fs";
-import path from "path";
-import { PrismaClient } from "@prisma/client";
 
-console.log("SCRIPT INICIADO");
-
-const rawConnectionString = process.env.DATABASE_URL;
-
-const prisma = new PrismaClient();
-
-if (!rawConnectionString) {
-  throw new Error("DATABASE_URL não encontrada no .env");
-}
 
 
 
@@ -80,15 +67,27 @@ if (!product) {
   });
 }
 
-    await prisma.offer.create({
-      data: {
-        productId: product.id,
-        storeId: store.id,
-        price: o.price,
-        city: o.city,
-        region: o.region,
-      },
-    });
+    const existingOffer = await prisma.offer.findFirst({
+  where: {
+    productId: product.id,
+    storeId: store.id,
+    price: o.price,
+    city: o.city,
+    region: o.region,
+  },
+});
+
+if (!existingOffer) {
+  await prisma.offer.create({
+    data: {
+      productId: product.id,
+      storeId: store.id,
+      price: o.price,
+      city: o.city,
+      region: o.region,
+    },
+  });
+}
   }
 
   console.log("IMPORTAÇÃO FINALIZADA");
