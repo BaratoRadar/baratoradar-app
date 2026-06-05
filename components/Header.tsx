@@ -28,12 +28,12 @@ export default function Header() {
           </div>
         </Link>
 
-        <nav className="grid grid-cols-2 gap-2 md:flex md:items-center md:gap-3">
+        <nav className="mt-2 grid w-full grid-cols-2 gap-3 md:mt-0 md:flex md:w-auto md:items-center md:gap-4">
           {nav.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2 text-center text-sm font-bold text-slate-700 shadow-sm transition hover:-translate-y-0.5 hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700 hover:shadow-md"
+              className="flex items-center justify-center rounded-2xl border-2 border-emerald-200 bg-emerald-50 px-6 py-4 text-center text-sm font-extrabold text-emerald-800 shadow-md transition hover:-translate-y-0.5 hover:border-emerald-400 hover:bg-emerald-100 hover:shadow-lg"
             >
               {item.label}
             </Link>
