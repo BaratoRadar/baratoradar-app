@@ -15,7 +15,8 @@ if (!rawConnectionString) {
 const prisma = new PrismaClient();
 
 function readCsv() {
-  const filePath = path.join(process.cwd(), "data", "ofertas_sp.csv");
+  const csvFile = process.argv[2] || "ofertas.csv";
+const filePath = path.join(process.cwd(), "data", csvFile);
 
   console.log("Lendo CSV em:", filePath);
 

@@ -4,18 +4,21 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
     "scrape:zaffari": "tsx scripts/scrapers/zaffari.ts",
     "scrape:carrefour": "tsx scripts/scrapers/carrefour.ts",
-    "import:offers": "tsx scripts/import-offers.ts"
+    "import:offers": "tsx scripts/import-offers.ts",
+    "import:offers:poa": "tsx scripts/import-offers.ts ofertas.csv",
+    "import:offers:sp": "tsx scripts/import-offers.ts ofertas_sp.csv"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
-    "@prisma/client": "^6.7.0",
+    "@prisma/adapter-pg": "^7.4.2",
+    "@prisma/client": "6.19.0",
     "cheerio": "^1.2.0",
     "next": "16.1.6",
     "pg": "^8.19.0",
@@ -31,7 +34,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
-    "prisma": "^6.7.0",
+    "prisma": "6.19.0",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
     "typescript": "^5"
