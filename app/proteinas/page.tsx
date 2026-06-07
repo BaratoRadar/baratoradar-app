@@ -70,6 +70,9 @@ export default async function ProteinasPage({
             <option value="">Todas as cidades</option>
             <option value="Porto Alegre">Porto Alegre</option>
             <option value="São Paulo">São Paulo</option>
+            <option value="Florianópolis">Florianópolis</option>
+            <option value="Curitiba">Curitiba</option>
+            <option value="Rio de Janeiro">Rio de Janeiro</option>
             <option value="Centro">Centro</option>
             <option value="Zona Norte">Zona Norte</option>
             <option value="Zona Sul">Zona Sul</option>

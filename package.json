@@ -11,7 +11,10 @@
     "scrape:carrefour": "tsx scripts/scrapers/carrefour.ts",
     "import:offers": "tsx scripts/import-offers.ts",
     "import:offers:poa": "tsx scripts/import-offers.ts ofertas.csv",
-    "import:offers:sp": "tsx scripts/import-offers.ts ofertas_sp.csv"
+    "import:offers:sp": "tsx scripts/import-offers.ts ofertas_sp.csv",
+    "import:offers:floripa": "tsx scripts/import-offers.ts ofertas_floripa.csv",
+"import:offers:curitiba": "tsx scripts/import-offers.ts ofertas_curitiba.csv",
+"import:offers:rio": "tsx scripts/import-offers.ts ofertas_rio.csv"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
