@@ -117,6 +117,9 @@ export default async function CestaPorRegiaoPage({
             <option value="Novo Hamburgo">Novo Hamburgo</option>
             <option value="São Leopoldo">São Leopoldo</option>
             <option value="Gravataí">Gravataí</option>
+            <option value="Belo Horizonte">Belo Horizonte</option>
+            <option value="Recife">Recife</option>
+            <option value="Fortaleza">Fortaleza</option>
           </select>
 
           <button className="rounded-xl bg-green-700 px-4 py-2 text-sm font-semibold text-white hover:bg-green-800">

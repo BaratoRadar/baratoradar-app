@@ -96,6 +96,9 @@ export default async function OfertasPage({
           <option value="Novo Hamburgo">Novo Hamburgo</option>
           <option value="São Leopoldo">São Leopoldo</option>
           <option value="Gravataí">Gravataí</option>
+          <option value="Belo Horizonte">Belo Horizonte</option>
+          <option value="Recife">Recife</option>
+          <option value="Fortaleza">Fortaleza</option>
         </select>
 
         <select

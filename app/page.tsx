@@ -178,6 +178,9 @@ export default async function HomePage({
         <option value="Florianópolis">Florianópolis</option>
         <option value="Curitiba">Curitiba</option>
         <option value="Rio de Janeiro">Rio de Janeiro</option>
+        <option value="Belo Horizonte">Belo Horizonte</option>
+        <option value="Recife">Recife</option>
+        <option value="Fortaleza">Fortaleza</option>
       </select>
 
       <button

@@ -76,6 +76,9 @@ export default async function ProteinasPage({
             <option value="Centro">Centro</option>
             <option value="Zona Norte">Zona Norte</option>
             <option value="Zona Sul">Zona Sul</option>
+            <option value="Belo Horizonte">Belo Horizonte</option>
+            <option value="Recife">Recife</option>
+            <option value="Fortaleza">Fortaleza</option>
           </select>
 
           <button

@@ -1,0 +1,14 @@
+productName,price,storeName,city,region,category
+Arroz 5kg,29.90,Supernosso,Belo Horizonte,Centro,Cesta Básica
+Feijão 1kg,8.29,BH Supermercados,Belo Horizonte,Pampulha,Cesta Básica
+Leite 1L,4.79,Verdemar,Belo Horizonte,Savassi,Cesta Básica
+Óleo 900ml,6.49,EPA,Belo Horizonte,Centro-Sul,Cesta Básica
+Café 500g,15.49,Supernosso,Belo Horizonte,Centro,Cesta Básica
+EOF~
+cat > data/ofertas_recife.csv <<'EOF'
+productName,price,storeName,city,region,category
+Arroz 5kg,31.90,Bompreço,Recife,Boa Viagem,Cesta Básica
+Feijão 1kg,8.49,Mateus,Recife,Centro,Cesta Básica
+Leite 1L,4.99,Carrefour,Recife,Zona Sul,Cesta Básica
+Óleo 900ml,6.79,Atacadão,Recife,Imbiribeira,Cesta Básica
+Café 500g,16.49,Bompreço,Recife,Boa Viagem,Cesta Básica
