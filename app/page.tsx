@@ -216,10 +216,7 @@ export default async function HomePage({
               currency: "BRL",
             })}
           </div>
-          <div className="mt-3 text-sm font-semibold text-slate-600">
-            {melhorOferta.store.name} • {melhorOferta.city} •{" "}
-            {melhorOferta.region}
-</div>
+          
           <p className="mt-2 text-sm text-slate-500">
   Menor preço em item da cesta básica entre os supermercados cadastrados.
 </p>
@@ -246,7 +243,10 @@ export default async function HomePage({
     currency: "BRL",
   })}
 </div>
-          
+      <div className="mt-3 text-sm font-semibold text-slate-600">
+  {melhorOferta.store.name} • {melhorOferta.city} •{" "}
+  {melhorOferta.region}
+</div>    
         </section>
       )}
 
