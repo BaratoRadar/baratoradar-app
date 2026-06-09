@@ -230,9 +230,7 @@ const menorItemCesta = await prisma.offer.findFirst({
 <div className="mt-2 text-lg font-bold text-slate-700">
   {menorItemCesta.product.name}
 </div>
-<div className="mt-2 text-sm font-semibold text-slate-600">
-  Comparativo baseado nos itens de cesta básica cadastrados no BaratoRadar.
-</div>
+
 
           <div className="mt-3 text-5xl font-black text-emerald-600">
             {menorItemCesta.price.toLocaleString("pt-BR", {
