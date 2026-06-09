@@ -33,7 +33,29 @@ export default async function HomePage({
     orderBy: { price: "asc" },
     take: 8,
   });
-
+const menorItemCesta = await prisma.offer.findFirst({
+  where: {
+    ...(cidade
+      ? {
+          city: {
+            equals: cidade,
+            mode: "insensitive",
+          },
+        }
+      : {}),
+    product: {
+      category: {
+        contains: "Cesta",
+        mode: "insensitive",
+      },
+    },
+  },
+  include: {
+    product: true,
+    store: true,
+  },
+  orderBy: { price: "asc" },
+});
   const cestaProducts = await prisma.product.findMany({
     where: {
       OR: [
@@ -193,7 +215,7 @@ export default async function HomePage({
   </div>
 </form>
 <div className="mt-10 space-y-6">
-      {maisBaratoCidade && (
+      {menorItemCesta && (
         <section
   className="rounded-3xl bg-white p-6 shadow-2xl ring-1 ring-slate-200"
   style={{ border: "4px solid #facc15" }}
@@ -203,22 +225,24 @@ export default async function HomePage({
           </div>
 
           <div className="mt-2 text-2xl font-extrabold text-slate-900">
-  {maisBaratoCidade.store}
+  {menorItemCesta.store.name}
 </div>
-
+<div className="mt-2 text-lg font-bold text-slate-700">
+  {menorItemCesta.product.name}
+</div>
 <div className="mt-2 text-sm font-semibold text-slate-600">
   Comparativo baseado nos itens de cesta básica cadastrados no BaratoRadar.
 </div>
 
           <div className="mt-3 text-5xl font-black text-emerald-600">
-            {maisBaratoCidade.total.toLocaleString("pt-BR", {
+            {menorItemCesta.price.toLocaleString("pt-BR", {
               style: "currency",
               currency: "BRL",
             })}
           </div>
           
           <p className="mt-2 text-sm text-slate-500">
-  Menor preço em item da cesta básica entre os supermercados cadastrados.
+  Menor preço encontrado para item de cesta básica cadastrado no BaratoRadar.
 </p>
 
         </section>
