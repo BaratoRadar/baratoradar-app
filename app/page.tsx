@@ -203,8 +203,12 @@ export default async function HomePage({
           </div>
 
           <div className="mt-2 text-2xl font-extrabold text-slate-900">
-            {maisBaratoCidade.store}
-          </div>
+  {maisBaratoCidade.store}
+</div>
+
+<div className="mt-2 text-sm font-semibold text-slate-600">
+  Comparativo baseado nos itens de cesta básica cadastrados no BaratoRadar.
+</div>
 
           <div className="mt-3 text-5xl font-black text-emerald-600">
             {maisBaratoCidade.total.toLocaleString("pt-BR", {
@@ -212,7 +216,10 @@ export default async function HomePage({
               currency: "BRL",
             })}
           </div>
-
+          <div className="mt-3 text-sm font-semibold text-slate-600">
+            {melhorOferta.store.name} • {melhorOferta.city} •{" "}
+            {melhorOferta.region}
+</div>
           <p className="mt-2 text-sm text-slate-500">
   Menor preço em item da cesta básica entre os supermercados cadastrados.
 </p>
