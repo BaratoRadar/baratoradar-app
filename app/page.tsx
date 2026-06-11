@@ -33,6 +33,14 @@ export default async function HomePage({
     orderBy: { price: "asc" },
     take: 8,
   });
+  const uniqueOffers = Array.from(
+  new Map(
+    offers.map((offer) => [
+      `${offer.product.name}-${offer.store.name}-${offer.price}-${offer.city}-${offer.region}`,
+      offer,
+    ])
+  ).values()
+);
 const menorItemCesta = await prisma.offer.findFirst({
   where: {
     ...(cidade
@@ -334,7 +342,7 @@ const menorItemCesta = await prisma.offer.findFirst({
         </div>
 
         <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          {offers.map((o) => (
+          {uniqueOffers.map((o) => (
             <div
               key={o.id}
               className="rounded-3xl border border-slate-200 bg-white p-5 shadow-md transition-all duration-200 hover:-translate-y-1 hover:shadow-2xl"
