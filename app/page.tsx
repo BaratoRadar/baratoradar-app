@@ -36,7 +36,7 @@ export default async function HomePage({
   const uniqueOffers = Array.from(
   new Map(
     offers.map((offer) => [
-      `${offer.product.name}-${offer.store.name}-${offer.price}-${offer.city}-${offer.region}`,
+      `${offer.product.name.toLowerCase()}-${offer.store.name.toLowerCase()}-${offer.price}-${offer.city?.toLowerCase()}-${offer.region?.toLowerCase()}`,
       offer,
     ])
   ).values()
@@ -88,7 +88,7 @@ const menorItemCesta = await prisma.offer.findFirst({
       },
     },
   });
-
+  const cestaProductNames = cestaProducts.map((p) => p.name).join(", ");
   const storeTotals: Record<string, number> = {};
 
   for (const product of cestaProducts) {
@@ -296,7 +296,15 @@ const menorItemCesta = await prisma.offer.findFirst({
           </Link>
         </div>
 
-        <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+<p className="mt-4 text-sm text-slate-500">
+  Comparativo baseado nos itens de cesta básica cadastrados por região.
+</p>
+
+<p className="mt-1 text-xs text-slate-400">
+  Itens considerados: {cestaProductNames}
+</p>
+
+<div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {rankingPorRegiao.map((item) => (
   <div
     key={item.region}

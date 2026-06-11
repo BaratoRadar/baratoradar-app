@@ -28,42 +28,49 @@ export default async function OfertasPage({
   const busca = (sp?.busca ?? "").trim();
   const cidade = (sp?.cidade ?? "").trim();
   const regiao = (sp?.regiao ?? "").trim();
-
-  const offers = await prisma.offer.findMany({
-    where: {
-      ...(busca
-        ? {
-            product: {
-              name: {
-                contains: busca,
-                mode: "insensitive",
-              },
-            },
-          }
-        : {}),
-      ...(cidade
-        ? {
-            city: {
-              equals: cidade,
+const offers = await prisma.offer.findMany({
+  where: {
+    ...(busca
+      ? {
+          product: {
+            name: {
+              contains: busca,
               mode: "insensitive",
             },
-          }
-        : {}),
-      ...(regiao
-        ? {
-            region: {
-              equals: regiao,
-              mode: "insensitive",
-            },
-          }
-        : {}),
-    },
-    include: {
-      product: true,
-      store: true,
-    },
-    orderBy: { price: "asc" },
-  });
+          },
+        }
+      : {}),
+    ...(cidade
+      ? {
+          city: {
+            equals: cidade,
+            mode: "insensitive",
+          },
+        }
+      : {}),
+    ...(regiao
+      ? {
+          region: {
+            equals: regiao,
+            mode: "insensitive",
+          },
+        }
+      : {}),
+  },
+  include: {
+    product: true,
+    store: true,
+  },
+  orderBy: { price: "asc" },
+});
+  const uniqueOffers = Array.from(
+  new Map(
+    offers.map((offer) => [
+      `${offer.product.name.toLowerCase()}-${offer.store.name.toLowerCase()}-${offer.price}-${offer.city?.toLowerCase()}-${offer.region?.toLowerCase()}`,
+      offer,
+    ])
+  ).values()
+);
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-10">
@@ -126,7 +133,7 @@ export default async function OfertasPage({
       </form>
 
       <p className="mt-4 text-xs text-slate-500">
-        Cidade: {cidade || "Todas"} | Região: {regiao || "Todas"} | Ofertas encontradas: {offers.length}
+        Cidade: {cidade || "Todas"} | Região: {regiao || "Todas"} | Ofertas encontradas: {uniqueOffers.length}
       </p>
 
       <div className="mt-6 overflow-hidden rounded-2xl border bg-white shadow-sm">
@@ -142,7 +149,7 @@ export default async function OfertasPage({
           </thead>
 
           <tbody>
-            {offers.map((o) => (
+            {uniqueOffers.map((o) => (
               <tr key={o.id} className="border-t">
                 <td className="px-4 py-3 font-medium text-slate-900">
                   {o.product.name}
