@@ -184,7 +184,7 @@ return {
 };
 })
 .filter((item) => item.winner);
-
+console.log("RANKING REGIAO:", rankingPorRegiao);
   const melhorOferta = offers[0] ?? null;
 
   return (
@@ -334,11 +334,12 @@ return {
     </div>
 
     <div className="mt-2 text-lg font-bold text-slate-900">
-      {item.winner?.store}
-      <div className="mt-1 text-sm font-semibold text-slate-600">
-  {item.productName}
+  {item.winner?.store}
 </div>
-    </div>
+
+<div className="mt-1 text-sm font-semibold text-slate-600">
+  Item de menor preço: {item.productName}
+</div>
 
     <div className="mt-2 text-2xl font-extrabold text-green-700">
       {item.winner?.total.toLocaleString("pt-BR", {
