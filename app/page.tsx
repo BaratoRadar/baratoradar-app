@@ -319,10 +319,6 @@ console.log("RANKING REGIAO:", rankingPorRegiao);
   Comparativo baseado nos itens de cesta básica cadastrados por região.
 </p>
 
-<p className="mt-1 text-xs text-slate-400">
-  Itens considerados: {cestaProductNames}
-</p>
-
 <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {rankingPorRegiao.map((item) => (
   <div
@@ -338,15 +334,19 @@ console.log("RANKING REGIAO:", rankingPorRegiao);
 </div>
 
 <div className="mt-1 text-sm font-semibold text-slate-600">
-  Item de menor preço: {item.productName}
+  {item.productName}
 </div>
 
-    <div className="mt-2 text-2xl font-extrabold text-green-700">
-      {item.winner?.total.toLocaleString("pt-BR", {
-        style: "currency",
-        currency: "BRL",
-      })}
-    </div>
+    <div className="mt-2 text-xs font-bold uppercase tracking-wide text-slate-500">
+  Total da cesta
+</div>
+
+<div className="mt-1 text-2xl font-extrabold text-green-700">
+  {item.winner?.total.toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  })}
+</div>
   </div>
 ))}
 
