@@ -117,7 +117,10 @@ const menorItemCesta = await prisma.offer.findFirst({
   const maisBaratoCidade = rankingCidade[0] ?? null;
 
   const regionStoreTotals: Record<string, Record<string, number>> = {};
-
+const bestRegionItem: Record<
+  string,
+  Record<string, { productName: string; price: number }>
+> = {};
   for (const product of cestaProducts) {
     const bestByRegionStore: Record<string, Record<string, number>> = {};
 
@@ -126,7 +129,18 @@ const menorItemCesta = await prisma.offer.findFirst({
 
       const region = offer.region;
       const store = offer.store.name;
+if (!bestRegionItem[region]) {
+  bestRegionItem[region] = {};
+}
 
+const currentBest = bestRegionItem[region][store];
+
+if (!currentBest || offer.price < currentBest.price) {
+  bestRegionItem[region][store] = {
+    productName: product.name,
+    price: offer.price,
+  };
+}
       if (!bestByRegionStore[region]) {
         bestByRegionStore[region] = {};
       }
@@ -159,12 +173,17 @@ const menorItemCesta = await prisma.offer.findFirst({
         .map(([store, total]) => ({ store, total }))
         .sort((a, b) => a.total - b.total);
 
-      return {
-        region,
-        winner: ranking[0] ?? null,
-      };
-    })
-    .filter((item) => item.winner);
+      const winner = ranking[0] ?? null;
+
+return {
+  region,
+  winner,
+  productName: winner
+    ? bestRegionItem[region]?.[winner.store]?.productName
+    : null,
+};
+})
+.filter((item) => item.winner);
 
   const melhorOferta = offers[0] ?? null;
 
@@ -316,6 +335,9 @@ const menorItemCesta = await prisma.offer.findFirst({
 
     <div className="mt-2 text-lg font-bold text-slate-900">
       {item.winner?.store}
+      <div className="mt-1 text-sm font-semibold text-slate-600">
+  {item.productName}
+</div>
     </div>
 
     <div className="mt-2 text-2xl font-extrabold text-green-700">
