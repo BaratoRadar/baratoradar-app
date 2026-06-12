@@ -39,7 +39,82 @@ export default async function ProteinasPage({
     orderBy: { price: "asc" }, // menor preço primeiro
     take: 100,
   });
+  const categoriasProteina = [
+  {
+    label: "Ovos",
+    icon: "🥚",
+    offer: offers.find((o) => o.product.name.toLowerCase().includes("ovo")),
+  },
+  {
+    label: "Frango",
+    icon: "🐔",
+    offer: offers.find(
+      (o) =>
+        o.product.name.toLowerCase().includes("frango") ||
+        o.product.name.toLowerCase().includes("coxa")
+    ),
+  },
+  {
+    label: "Suínos",
+    icon: "🐷",
+    offer: offers.find(
+      (o) =>
+        o.product.name.toLowerCase().includes("suíno") ||
+        o.product.name.toLowerCase().includes("suino") ||
+        o.product.name.toLowerCase().includes("lombo")
+    ),
+  },
+  {
+    label: "Bovinos",
+    icon: "🥩",
+    offer: offers.find((o) => o.product.name.toLowerCase().includes("bovina")),
+  },
+  {
+    label: "Peixes",
+    icon: "🐟",
+    offer: offers.find(
+      (o) =>
+        o.product.name.toLowerCase().includes("peixe") ||
+        o.product.name.toLowerCase().includes("filé")
+    ),
+  },
+];
+const ovos = offers.find(
+  (o) =>
+    o.product.name.toLowerCase().includes("ovo")
+);
 
+const frango = offers.find(
+  (o) =>
+    o.product.name.toLowerCase().includes("frango")
+);
+
+const peixe = offers.find(
+  (o) =>
+    o.product.name.toLowerCase().includes("peixe")
+);
+
+const bovino = offers.find(
+  (o) =>
+    o.product.name.toLowerCase().includes("bovina") ||
+    o.product.name.toLowerCase().includes("alcatra") ||
+    o.product.name.toLowerCase().includes("coxão")
+);
+
+const suino = offers.find(
+  (o) =>
+    o.product.name.toLowerCase().includes("suína") ||
+    o.product.name.toLowerCase().includes("suino") ||
+    o.product.name.toLowerCase().includes("lombo")
+);
+const uniqueOffers = Array.from(
+  new Map(
+    offers.map((offer) => [
+      `${offer.product.name.toLowerCase()}-${offer.store.name.toLowerCase()}-${offer.price}`,
+      offer,
+    ])
+  ).values()
+);
   return (
     <main className="mx-auto max-w-6xl px-4 py-8">
       <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
@@ -49,9 +124,7 @@ export default async function ProteinasPage({
             Frango, bovinos, suínos, ovos e peixes — ordenados pelo menor preço.
           </p>
 
-          <p className="mt-2 text-xs text-slate-500">
-            Debug: q={q || "-"} | regiao={regiao || "-"} | resultados={offers.length}
-          </p>
+          
         </div>
 
         <form method="get" className="flex flex-col gap-2 md:flex-row md:items-center">
@@ -112,7 +185,38 @@ export default async function ProteinasPage({
           </div>
         </div>
       )}
+<div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+  {categoriasProteina.map(
+    (item) =>
+      item.offer && (
+        <div
+          key={item.label}
+          className="rounded-2xl border bg-white p-4 shadow-sm hover:shadow-md transition-all"
+        >
+          <div className="text-2xl">{item.icon}</div>
 
+          <div className="mt-2 text-sm font-bold uppercase tracking-wide text-slate-500">
+            {item.label}
+          </div>
+
+          <div className="mt-2 text-sm font-semibold text-slate-900">
+            {item.offer.product.name}
+          </div>
+
+          <div className="mt-2 text-2xl font-extrabold text-green-700">
+            {item.offer.price.toLocaleString("pt-BR", {
+              style: "currency",
+              currency: "BRL",
+            })}
+          </div>
+
+          <div className="mt-2 text-xs text-slate-500">
+            {item.offer.store.name} • {item.offer.city}
+          </div>
+        </div>
+      )
+  )}
+</div>
       <div className="mt-6 overflow-hidden rounded-2xl border bg-white shadow-sm">
         <table className="w-full text-left text-sm">
           <thead className="bg-slate-50 text-slate-700">
@@ -125,7 +229,7 @@ export default async function ProteinasPage({
             </tr>
           </thead>
           <tbody>
-            {offers.map((o) => (
+            {uniqueOffers.map((o) => (
               <tr key={o.id} className="border-t">
                 <td className="px-4 py-3 font-medium text-slate-900">
                   {o.product.name} {o.unit ? `(${o.unit})` : ""}
@@ -141,7 +245,7 @@ export default async function ProteinasPage({
               </tr>
             ))}
 
-            {offers.length === 0 && (
+            {uniqueOffers.length === 0 && (
               <tr>
                 <td className="px-4 py-6 text-slate-600" colSpan={5}>
                   Nenhuma oferta de proteínas encontrada. Rode o seed novamente ou adicione mais itens.
