@@ -135,6 +135,8 @@ export default async function CestaRankingPage({
             <option value="Fortaleza">Fortaleza</option>
             <option value="Brasília">Brasília</option>
             <option value="Goiânia">Goiânia</option>
+            <option value="Belém">Belém</option>
+            <option value="Manaus">Manaus</option>
           </select>
 
           <button className="rounded-xl bg-green-700 px-4 py-2 text-sm font-semibold text-white hover:bg-green-800">
