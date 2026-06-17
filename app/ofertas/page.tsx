@@ -106,6 +106,8 @@ const offers = await prisma.offer.findMany({
           <option value="Belo Horizonte">Belo Horizonte</option>
           <option value="Recife">Recife</option>
           <option value="Fortaleza">Fortaleza</option>
+          <option value="Brasília">Brasília</option>
+          <option value="Goiânia">Goiânia</option>
         </select>
 
         <select

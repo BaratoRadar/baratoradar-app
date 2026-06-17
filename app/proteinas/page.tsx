@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 
 type SP = {
   q?: string;
-  regiao?: string;
+  cidade?: string;
 };
 
 export default async function ProteinasPage({
@@ -17,7 +17,7 @@ export default async function ProteinasPage({
   const sp = searchParams instanceof Promise ? await searchParams : searchParams;
 
   const q = (sp?.q ?? "").trim();
-  const regiao = (sp?.regiao ?? "").trim();
+  const cidade = (sp?.cidade ?? "").trim();
 
   const offers = await prisma.offer.findMany({
     where: {
@@ -29,9 +29,9 @@ export default async function ProteinasPage({
             }
           : {}),
       },
-      ...(regiao
+      ...(cidade
         ? {
-            region: { contains: regiao, mode: "insensitive" },
+            city: { equals: cidade, mode: "insensitive" },
           }
         : {}),
     },
@@ -136,8 +136,8 @@ const uniqueOffers = Array.from(
           />
 
           <select
-            name="regiao"
-            defaultValue={regiao}
+            name="cidade"
+            defaultValue={cidade}
             className="rounded-xl border px-4 py-2 text-sm"
           >
             <option value="">Todas as cidades</option>
@@ -152,6 +152,8 @@ const uniqueOffers = Array.from(
             <option value="Belo Horizonte">Belo Horizonte</option>
             <option value="Recife">Recife</option>
             <option value="Fortaleza">Fortaleza</option>
+            <option value="Brasília">Brasília</option>
+            <option value="Goiânia">Goiânia</option>
           </select>
 
           <button
