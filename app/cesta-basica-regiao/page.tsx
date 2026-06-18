@@ -95,7 +95,9 @@ export default async function CestaPorRegiaoPage({
           <p className="mt-2 text-slate-600">
             Ranking dos supermercados por região da cidade
           </p>
-
+<p className="mt-2 text-sm text-slate-500">
+  Itens considerados: Arroz 5kg • Feijão 1kg • Leite 1L • Óleo 900ml
+</p>
           <p className="mt-2 text-xs text-slate-500">
             Cidade selecionada: {cidade || "Todas"} | regiões: {regions.length}
           </p>
@@ -168,6 +170,9 @@ export default async function CestaPorRegiaoPage({
                           style: "currency",
                           currency: "BRL",
                         })}
+                        <div className="mt-2 text-xs font-medium text-slate-500">
+  🛒 4 itens da cesta básica
+</div>
                       </div>
                     </div>
                   </div>
