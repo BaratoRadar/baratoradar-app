@@ -1,10 +1,11 @@
 import Link from "next/link";
 
 const nav = [
-  { href: "/ofertas", label: "Ofertas" },
-  { href: "/proteinas", label: "Proteínas" },
-  { href: "/cesta-basica", label: "Cesta básica" },
-  { href: "/limpeza", label: "Limpeza" },
+  { href: "/", label: "🏠 Início" },
+  { href: "/ofertas", label: "🔥 Ofertas" },
+  { href: "/proteinas", label: "🥚 Proteínas" },
+  { href: "/cesta-basica-regiao", label: "🛒 Cesta básica" },
+  { href: "/cesta-basica-ranking", label: "📊 Rankings" },
 ];
 
 export default function Header() {
@@ -28,12 +29,12 @@ export default function Header() {
           </div>
         </Link>
 
-        <nav className="mt-2 grid w-full grid-cols-2 gap-3 md:mt-0 md:flex md:w-auto md:items-center md:gap-4">
+        <nav className="mt-3 grid w-full grid-cols-2 gap-3 sm:grid-cols-3 md:mt-0 md:flex md:w-auto md:flex-wrap md:items-center md:justify-end md:gap-3">
           {nav.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className="flex items-center justify-center rounded-2xl border-2 border-emerald-200 bg-emerald-50 px-6 py-4 text-center text-sm font-extrabold text-emerald-800 shadow-md transition hover:-translate-y-0.5 hover:border-emerald-400 hover:bg-emerald-100 hover:shadow-lg"
+              className="flex min-w-[135px] items-center justify-center rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-white px-4 py-3 text-center text-sm font-extrabold text-emerald-800 shadow-sm transition hover:-translate-y-0.5 hover:border-emerald-400 hover:bg-emerald-100 hover:shadow-md"
             >
               {item.label}
             </Link>
