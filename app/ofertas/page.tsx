@@ -149,6 +149,7 @@ const offers = await prisma.offer.findMany({
               <th className="px-4 py-3">Preço</th>
               <th className="px-4 py-3">Cidade</th>
               <th className="px-4 py-3">Região</th>
+              <th className="px-4 py-3">Atualização</th>
             </tr>
           </thead>
 
@@ -182,12 +183,23 @@ const offers = await prisma.offer.findMany({
                 <td className="px-4 py-3 text-slate-700">
                   {o.region ?? "-"}
                 </td>
+                <td className="px-4 py-3 text-xs font-semibold">
+                {o.source === "scraper" ? (
+                <span className="rounded-full bg-emerald-100 px-2 py-1 text-emerald-700">
+                🟢 Automática
+                </span>
+                ) : (
+                <span className="rounded-full bg-amber-100 px-2 py-1 text-amber-700">
+                🟡 Referência
+                </span>
+                )}
+                </td> 
               </tr>
             ))}
 
             {offers.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-6 text-slate-600">
+                <td colSpan={6} className="px-4 py-6 text-slate-600">
                   Nenhuma oferta encontrada.
                 </td>
               </tr>
