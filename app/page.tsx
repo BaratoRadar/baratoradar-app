@@ -184,9 +184,69 @@ return {
 };
 })
 .filter((item) => item.winner);
-console.log("RANKING REGIAO:", rankingPorRegiao);
-  const melhorOferta = offers[0] ?? null;
 
+  const melhorOferta = offers[0] ?? null;
+const proteinas = await prisma.offer.findMany({
+  where: {
+    product: {
+      category: "Proteínas",
+    },
+  },
+  include: {
+    product: true,
+    store: true,
+  },
+  orderBy: { price: "asc" },
+});
+
+const painelProteinas = [
+  {
+    label: "Ovos",
+    icon: "🥚",
+    offer: proteinas.find((o) =>
+      o.product.name.toLowerCase().includes("ovo")
+    ),
+  },
+  {
+    label: "Frango",
+    icon: "🐔",
+    offer: proteinas.find(
+      (o) =>
+        o.product.name.toLowerCase().includes("frango") ||
+        o.product.name.toLowerCase().includes("coxa")
+    ),
+  },
+  {
+    label: "Suínos",
+    icon: "🐷",
+    offer: proteinas.find(
+      (o) =>
+        o.product.name.toLowerCase().includes("suíno") ||
+        o.product.name.toLowerCase().includes("suino") ||
+        o.product.name.toLowerCase().includes("lombo")
+    ),
+  },
+  {
+    label: "Bovinos",
+    icon: "🥩",
+    offer: proteinas.find(
+      (o) =>
+        o.product.name.toLowerCase().includes("bovina") ||
+        o.product.name.toLowerCase().includes("alcatra") ||
+        o.product.name.toLowerCase().includes("coxão")
+    ),
+  },
+  {
+    label: "Pescados",
+    icon: "🐟",
+    offer: proteinas.find(
+      (o) =>
+        o.product.name.toLowerCase().includes("peixe") ||
+        o.product.name.toLowerCase().includes("tilápia") ||
+        o.product.name.toLowerCase().includes("filé")
+    ),
+  },
+];
   return (
     <main className="mx-auto max-w-6xl px-4 py-10 space-y-10">
       <section className="rounded-3xl bg-gradient-to-r from-slate-900 to-emerald-900 text-white p-8 md:p-12 shadow-xl mb-8">
@@ -302,7 +362,63 @@ console.log("RANKING REGIAO:", rankingPorRegiao);
 </div>    
         </section>
       )}
+<section className="rounded-3xl border border-emerald-200 bg-white p-6 shadow-xl">
+  <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+    <div>
+      <div className="inline-flex items-center rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-700">
+        🇧🇷 PAINEL NACIONAL DE PROTEÍNAS
+      </div>
 
+      <h2 className="mt-3 text-2xl font-black text-slate-900">
+        Menores preços nacionais por proteína
+      </h2>
+
+      <p className="mt-1 text-sm text-slate-500">
+        Comparativo entre as capitais monitoradas pelo BaratoRadar.
+      </p>
+    </div>
+
+    <Link
+      href="/proteinas"
+      className="rounded-full bg-emerald-100 px-4 py-2 text-sm font-bold text-emerald-700 hover:bg-emerald-200"
+    >
+      Ver proteínas
+    </Link>
+  </div>
+
+  <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+    {painelProteinas.map(
+      (item) =>
+        item.offer && (
+          <div
+            key={item.label}
+            className="rounded-2xl border border-emerald-100 bg-gradient-to-br from-emerald-50 to-white p-4 shadow-sm"
+          >
+            <div className="text-3xl">{item.icon}</div>
+
+            <div className="mt-2 text-xs font-bold uppercase tracking-wide text-slate-500">
+              {item.label}
+            </div>
+
+            <div className="mt-2 text-sm font-semibold text-slate-900">
+              {item.offer.product.name}
+            </div>
+
+            <div className="mt-2 text-2xl font-extrabold text-emerald-700">
+              {item.offer.price.toLocaleString("pt-BR", {
+                style: "currency",
+                currency: "BRL",
+              })}
+            </div>
+
+            <div className="mt-2 text-xs text-slate-500">
+              {item.offer.store.name} • {item.offer.city}
+            </div>
+          </div>
+        )
+    )}
+  </div>
+</section>
 </div>
 
 <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-xl">
