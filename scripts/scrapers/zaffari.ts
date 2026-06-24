@@ -226,6 +226,7 @@ async function saveOffers(offers: ParsedOffer[]) {
         price: offer.price,
         city: offer.city,
         region: offer.region,
+        source: "scraper",
       },
     });
 

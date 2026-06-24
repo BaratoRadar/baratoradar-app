@@ -87,7 +87,7 @@ async function main() {
         price: o.price,
         city: o.city,
         region: o.region,
-        source: "scraper",
+        source: "manual",
       },
     });
   }
