@@ -1,6 +1,6 @@
 
 import Header from "../components/Header";
-
+import { Analytics } from "@vercel/analytics/react";
 
 export const metadata = {
   title: "BaratoRadar",
@@ -21,7 +21,7 @@ export default function RootLayout({
 
   <Header />
   {children}
-  
+  <Analytics />
 </body>
     </html>
   );
