@@ -163,6 +163,7 @@ async function main() {
         price,
         city,
         region,
+        source: "scraper",
       },
     });
 
