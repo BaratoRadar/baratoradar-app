@@ -103,8 +103,9 @@ async function main() {
   });
 
   if (!response.ok) {
-    throw new Error(`Erro ao buscar Carrefour: ${response.status}`);
-  }
+  console.warn(`Carrefour indisponível no momento: ${response.status}`);
+  return;
+}
 
   const data: any[] = await response.json();
 
@@ -117,7 +118,7 @@ async function main() {
   const store = await findOrCreateStore(storeName, city);
 
   let inserted = 0;
-  let skipped = 0;
+  let updated = 0;
   let ignored = 0;
 
   for (const item of data) {
@@ -152,9 +153,22 @@ async function main() {
     });
 
     if (exists) {
-      skipped += 1;
-      continue;
-    }
+  await prisma.offer.updateMany({
+    where: {
+      productId: product.id,
+      storeId: store.id,
+      price,
+      city,
+      region,
+    },
+    data: {
+      source: "scraper",
+    },
+  });
+
+  updated += 1;
+  continue;
+}
 
     await prisma.offer.create({
       data: {
@@ -171,10 +185,15 @@ async function main() {
     console.log("Salvo:", productName, price);
   }
 
-  console.log("Novas ofertas inseridas:", inserted);
-  console.log("Ofertas duplicadas ignoradas:", skipped);
-  console.log("Produtos ignorados:", ignored);
-  console.log("Scraper Carrefour finalizado.");
+   console.log("\n=================================");
+   console.log("      BARATORADAR SCRAPER");
+   console.log("=================================");
+   console.log("Supermercado :", storeName);
+   console.log("Cidade       :", city);
+   console.log("Novas        :", inserted);
+   console.log("Atualizadas  :", updated);
+   console.log("Ignoradas    :", ignored);
+   console.log("=================================\n");
 }
 
 main()

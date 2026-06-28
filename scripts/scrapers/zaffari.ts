@@ -201,7 +201,7 @@ async function saveOffers(offers: ParsedOffer[]) {
   const store = await findOrCreateStore("Zaffari", "Porto Alegre");
 
   let inserted = 0;
-  let skipped = 0;
+  let updated = 0;
 
   for (const offer of offers) {
     const product = await findOrCreateProduct(offer.productName, offer.category);
@@ -215,9 +215,22 @@ async function saveOffers(offers: ParsedOffer[]) {
     });
 
     if (exists) {
-      skipped += 1;
-      continue;
-    }
+  await prisma.offer.updateMany({
+    where: {
+      productId: product.id,
+      storeId: store.id,
+      price: offer.price,
+      city: offer.city,
+      region: offer.region,
+    },
+    data: {
+      source: "scraper",
+    },
+  });
+
+  updated += 1;
+  continue;
+}
 
     await prisma.offer.create({
       data: {
@@ -234,7 +247,7 @@ async function saveOffers(offers: ParsedOffer[]) {
   }
 
   console.log(`Novas ofertas inseridas: ${inserted}`);
-  console.log(`Ofertas duplicadas ignoradas: ${skipped}`);
+  console.log(`Ofertas existentes atualizadas: ${updated}`);
 }
 
 async function main() {
