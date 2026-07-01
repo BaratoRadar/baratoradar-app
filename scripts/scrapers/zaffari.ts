@@ -1,7 +1,10 @@
 
 import * as cheerio from "cheerio";
 import { PrismaClient } from "@prisma/client";
-
+import {
+  findOrCreateStore as sharedFindOrCreateStore,
+  findOrCreateProduct as sharedFindOrCreateProduct,
+} from "../../lib/scraper-utils";
 
 const rawConnectionString = process.env.DATABASE_URL;
 const prisma = new PrismaClient();
@@ -198,13 +201,13 @@ async function offerAlreadyExists(params: {
 }
 
 async function saveOffers(offers: ParsedOffer[]) {
-  const store = await findOrCreateStore("Zaffari", "Porto Alegre");
+  const store = await sharedFindOrCreateStore("Zaffari", "Porto Alegre");
 
   let inserted = 0;
   let updated = 0;
 
   for (const offer of offers) {
-    const product = await findOrCreateProduct(offer.productName, offer.category);
+    const product = await sharedFindOrCreateProduct(offer.productName, offer.category);
 
     const exists = await offerAlreadyExists({
       productId: product.id,
