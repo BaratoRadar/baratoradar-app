@@ -4,6 +4,7 @@ import { PrismaClient } from "@prisma/client";
 import {
   findOrCreateStore as sharedFindOrCreateStore,
   findOrCreateProduct as sharedFindOrCreateProduct,
+  saveOrUpdateOffer,
 } from "../../lib/scraper-utils";
 
 const rawConnectionString = process.env.DATABASE_URL;
@@ -209,42 +210,20 @@ async function saveOffers(offers: ParsedOffer[]) {
   for (const offer of offers) {
     const product = await sharedFindOrCreateProduct(offer.productName, offer.category);
 
-    const exists = await offerAlreadyExists({
-      productId: product.id,
-      storeId: store.id,
-      price: offer.price,
-      city: offer.city,
-      region: offer.region,
-    });
+    const result = await saveOrUpdateOffer({
+  productId: product.id,
+  storeId: store.id,
+  price: offer.price,
+  city: offer.city,
+  region: offer.region,
+  source: "scraper",
+});
 
-    if (exists) {
-  await prisma.offer.updateMany({
-    where: {
-      productId: product.id,
-      storeId: store.id,
-      price: offer.price,
-      city: offer.city,
-      region: offer.region,
-    },
-    data: {
-      source: "scraper",
-    },
-  });
-
+if (result === "created") {
+  inserted += 1;
+} else {
   updated += 1;
-  continue;
 }
-
-    await prisma.offer.create({
-      data: {
-        productId: product.id,
-        storeId: store.id,
-        price: offer.price,
-        city: offer.city,
-        region: offer.region,
-        source: "scraper",
-      },
-    });
 
     inserted += 1;
   }
