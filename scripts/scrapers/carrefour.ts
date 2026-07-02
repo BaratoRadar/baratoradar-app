@@ -1,5 +1,10 @@
 
 import { PrismaClient } from "@prisma/client";
+import {
+  findOrCreateStore as sharedFindOrCreateStore,
+  findOrCreateProduct as sharedFindOrCreateProduct,
+  saveOrUpdateOffer,
+} from "../../lib/scraper-utils";
 // workflow rebuild trigger
 const prisma = new PrismaClient();
 
@@ -115,14 +120,14 @@ async function main() {
   const city = "Porto Alegre";
   const region = "Zona Norte";
 
-  const store = await findOrCreateStore(storeName, city);
+  const store = await sharedFindOrCreateStore(storeName, city);
 
   let inserted = 0;
   let updated = 0;
   let ignored = 0;
 
   for (const item of data) {
-    const productName = item.productName;
+  const productName = item.productName;  
 
     if (!productName) {
       ignored += 1;
@@ -142,47 +147,24 @@ async function main() {
       continue;
     }
 
-    const product = await findOrCreateProduct(productName);
+    const product = await sharedFindOrCreateProduct(productName, "Oferta");
 
-    const exists = await offerAlreadyExists({
-      productId: product.id,
-      storeId: store.id,
-      price,
-      city,
-      region,
-    });
+    const result = await saveOrUpdateOffer({
+  productId: product.id,
+  storeId: store.id,
+  price,
+  city,
+  region,
+  source: "scraper",
+});
 
-    if (exists) {
-  await prisma.offer.updateMany({
-    where: {
-      productId: product.id,
-      storeId: store.id,
-      price,
-      city,
-      region,
-    },
-    data: {
-      source: "scraper",
-    },
-  });
-
+if (result === "created") {
+  inserted += 1;
+} else {
   updated += 1;
-  continue;
 }
 
-    await prisma.offer.create({
-      data: {
-        productId: product.id,
-        storeId: store.id,
-        price,
-        city,
-        region,
-        source: "scraper",
-      },
-    });
-
-    inserted += 1;
-    console.log("Salvo:", productName, price);
+    
   }
 
    console.log("\n=================================");
