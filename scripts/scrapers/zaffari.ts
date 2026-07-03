@@ -1,4 +1,4 @@
-
+import { logger } from "../../lib/logger";
 import * as cheerio from "cheerio";
 import { PrismaClient } from "@prisma/client";
 import {
@@ -147,59 +147,10 @@ function extractOffers(html: string, sourceUrl: string): ParsedOffer[] {
   return [...unique.values()];
 }
 
-async function findOrCreateStore(name: string, city: string) {
-  const existing = await prisma.store.findFirst({
-    where: { name, city },
-  });
 
-  if (existing) return existing;
 
-  return prisma.store.create({
-    data: { name, city },
-  });
-}
+  
 
-async function findOrCreateProduct(name: string, category: string) {
-  const existing = await prisma.product.findFirst({
-    where: { name },
-  });
-
-  if (existing) return existing;
-
-  return prisma.product.create({
-    data: { name, category },
-  });
-}
-
-async function offerAlreadyExists(params: {
-  productId: string;
-  storeId: string;
-  price: number;
-  city: string;
-  region: string;
-}) {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-
-  const existing = await prisma.offer.findFirst({
-    where: {
-      productId: params.productId,
-      storeId: params.storeId,
-      price: params.price,
-      city: params.city,
-      region: params.region,
-      createdAt: {
-        gte: today,
-        lt: tomorrow,
-      },
-    },
-  });
-
-  return !!existing;
-}
 
 async function saveOffers(offers: ParsedOffer[]) {
   const store = await sharedFindOrCreateStore("Zaffari", "Porto Alegre");
@@ -228,8 +179,12 @@ if (result === "created") {
     inserted += 1;
   }
 
-  console.log(`Novas ofertas inseridas: ${inserted}`);
-  console.log(`Ofertas existentes atualizadas: ${updated}`);
+  logger.section("BARATORADAR SCRAPER");
+
+logger.info("Supermercado", "Zaffari");
+logger.success("Novas ofertas", inserted);
+logger.info("Atualizadas", updated);
+
 }
 
 async function main() {
