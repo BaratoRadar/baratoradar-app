@@ -1,4 +1,4 @@
-
+import { logger } from "../../lib/logger";
 import { PrismaClient } from "@prisma/client";
 import {
   findOrCreateStore as sharedFindOrCreateStore,
@@ -28,70 +28,7 @@ function categoriaRelevante(nome: string) {
   );
 }
 
-async function findOrCreateStore(name: string, city: string) {
-  const existing = await prisma.store.findFirst({
-    where: {
-      name,
-      city,
-    },
-  });
 
-  if (existing) return existing;
-
-  return prisma.store.create({
-    data: {
-      name,
-      city,
-    },
-  });
-}
-
-async function findOrCreateProduct(name: string) {
-  const existing = await prisma.product.findFirst({
-    where: {
-      name,
-    },
-  });
-
-  if (existing) return existing;
-
-  return prisma.product.create({
-    data: {
-      name,
-      category: "Oferta",
-    },
-  });
-}
-
-async function offerAlreadyExists(params: {
-  productId: string;
-  storeId: string;
-  price: number;
-  city: string;
-  region: string;
-}) {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-
-  const existing = await prisma.offer.findFirst({
-    where: {
-      productId: params.productId,
-      storeId: params.storeId,
-      price: params.price,
-      city: params.city,
-      region: params.region,
-      createdAt: {
-        gte: today,
-        lt: tomorrow,
-      },
-    },
-  });
-
-  return !!existing;
-}
 
 async function main() {
   console.log("Buscando ofertas do Carrefour...");
@@ -167,15 +104,13 @@ if (result === "created") {
     
   }
 
-   console.log("\n=================================");
-   console.log("      BARATORADAR SCRAPER");
-   console.log("=================================");
-   console.log("Supermercado :", storeName);
-   console.log("Cidade       :", city);
-   console.log("Novas        :", inserted);
-   console.log("Atualizadas  :", updated);
-   console.log("Ignoradas    :", ignored);
-   console.log("=================================\n");
+   logger.section("BARATORADAR SCRAPER");
+
+logger.info("Supermercado", storeName);
+logger.info("Cidade", city);
+logger.success("Novas ofertas", inserted);
+logger.info("Atualizadas", updated);
+logger.warn("Ignoradas", ignored);
 }
 
 main()
