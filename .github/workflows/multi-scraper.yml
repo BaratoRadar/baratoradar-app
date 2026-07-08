@@ -7,9 +7,18 @@ on:
     - cron: "0 9 * * *"
 
 jobs:
-  zaffari:
-    name: Scraper Zaffari
+  scraper:
     runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        scraper:
+          - zaffari
+          - carrefour
+          - atacadao
+
+    name: Scraper ${{ matrix.scraper }}
 
     steps:
       - name: Baixar repositório
@@ -18,7 +27,7 @@ jobs:
       - name: Instalar Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           cache: npm
 
       - name: Instalar dependências
@@ -27,34 +36,8 @@ jobs:
       - name: Gerar Prisma Client
         run: npx prisma generate
 
-      - name: Rodar scraper Zaffari
+      - name: Rodar scraper
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           NODE_TLS_REJECT_UNAUTHORIZED: "0"
-        run: npm run scrape:zaffari
-
-  carrefour:
-    name: Scraper Carrefour
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Baixar repositório
-        uses: actions/checkout@v4
-
-      - name: Instalar Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-
-      - name: Instalar dependências
-        run: npm install
-
-      - name: Gerar Prisma Client
-        run: npx prisma generate
-
-      - name: Rodar scraper Carrefour
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          NODE_TLS_REJECT_UNAUTHORIZED: "0"
-        run: npm run scrape:carrefour || true
+        run: npm run scrape:${{ matrix.scraper }}

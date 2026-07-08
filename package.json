@@ -9,6 +9,7 @@
     "lint": "eslint",
     "scrape:zaffari": "./node_modules/.bin/tsx scripts/scrapers/zaffari.ts",
     "scrape:carrefour": "./node_modules/.bin/tsx scripts/scrapers/carrefour.ts",
+    "scrape:atacadao": "./node_modules/.bin/tsx scripts/scrapers/atacadao.ts",
     "import:offers": "tsx scripts/import-offers.ts",
     "import:offers:poa": "tsx scripts/import-offers.ts ofertas.csv",
     "import:offers:sp": "tsx scripts/import-offers.ts ofertas_sp.csv",
