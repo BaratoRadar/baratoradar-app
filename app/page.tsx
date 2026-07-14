@@ -252,16 +252,21 @@ const painelProteinas = [
       <section className="rounded-3xl bg-gradient-to-r from-slate-900 to-emerald-900 text-white p-8 md:p-12 shadow-xl mb-8">
   <div className="max-w-3xl">
     <p className="uppercase tracking-widest text-emerald-300 text-xs font-bold mb-3">
-      Plataforma em teste
-    </p>
+  🟢 Atualização diária das ofertas
+</p>
 
-    <h1 className="text-4xl md:text-6xl font-black leading-tight">
-      Compare ofertas e encontre os melhores preços.
-    </h1>
+<h1 className="text-4xl md:text-6xl font-black leading-tight">
+  Compare preços antes de ir ao supermercado.
+</h1>
 
-    <p className="mt-5 text-slate-200 text-lg">
-      Proteínas, cesta básica e supermercados monitorados em tempo real.
-    </p>
+<p className="mt-5 text-slate-200 text-lg leading-relaxed">
+  Descubra onde os produtos que você procura estão mais baratos,
+  escolha onde comprar melhor e economize nas compras do dia a dia.
+</p>
+
+<p className="mt-5 text-base font-semibold text-emerald-200">
+  Zaffari • Carrefour • Atacadão • Sam's Club
+</p>
   </div>
 </section>
 <form method="get" className="rounded-3xl border border-slate-200 bg-white p-5 shadow-lg">
