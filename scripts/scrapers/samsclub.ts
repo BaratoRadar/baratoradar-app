@@ -20,7 +20,7 @@ type ParsedOffer = {
 };
 async function fetchOffers(): Promise<ParsedOffer[]> {
   const url =
-    "https://www.atacadao.com.br/api/catalog_system/pub/products/search?ft=arroz";
+    "https://www.samsclub.com.br/api/catalog_system/pub/products/search?ft=arroz";
 
   const response = await retry(() =>
     fetch(url, {
@@ -33,31 +33,31 @@ async function fetchOffers(): Promise<ParsedOffer[]> {
   );
 
   if (!response.ok) {
-    throw new Error(`Erro Atacadão: ${response.status}`);
+    throw new Error(`Erro Sam's Club: ${response.status}`);
   }
 
   const data: any[] = await response.json();
 
   logger.info("Produtos encontrados", data.length);
-  
+
   return data
-  .map((item) => {
-    const price =
-      item.items?.[0]?.sellers?.[0]?.commertialOffer?.Price ?? null;
+    .map((item) => {
+      const price =
+        item.items?.[0]?.sellers?.[0]?.commertialOffer?.Price ?? null;
 
-    if (!item.productName || !price) return null;
+      if (!item.productName || !price) return null;
 
-    return {
-      productName: item.productName,
-      price,
-      storeName: "Atacadão",
-      city: "Porto Alegre",
-      region: "Zona Norte",
-      category: "Cesta Básica",
-      sourceUrl: item.link ?? url,
-    };
-  })
-  .filter(Boolean) as ParsedOffer[];
+      return {
+        productName: item.productName,
+        price,
+        storeName: "Sam's Club",
+        city: "Porto Alegre",
+        region: "Zona Norte",
+        category: item.categories?.[0] ?? "Clube de Compras",
+        sourceUrl: item.link ?? url,
+      };
+    })
+    .filter(Boolean) as ParsedOffer[];
 }
 
 async function saveOffers(offers: ParsedOffer[]) {
