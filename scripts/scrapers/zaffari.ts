@@ -176,7 +176,7 @@ if (result === "created") {
   updated += 1;
 }
 
-    inserted += 1;
+
   }
 
   logger.section("BARATORADAR SCRAPER");

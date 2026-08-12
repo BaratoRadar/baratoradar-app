@@ -1,9 +1,12 @@
+import Link from "next/link";
+
+import QuickCategories from "@/components/QuickCategories";
+import HomeHero from "@/components/home/HomeHero";
+import { prisma } from "@/lib/prisma";
+
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 export const fetchCache = "force-no-store";
-
-import Link from "next/link";
-import { prisma } from "@/lib/prisma";
 
 type SP = {
   cidade?: string;
@@ -249,97 +252,10 @@ const painelProteinas = [
 ];
   return (
     <main className="mx-auto max-w-6xl px-4 py-10 space-y-10">
-      <section className="rounded-3xl bg-gradient-to-r from-slate-900 to-emerald-900 text-white p-8 md:p-12 shadow-xl mb-8">
-  <div className="max-w-3xl">
-    <p className="uppercase tracking-widest text-emerald-300 text-xs font-bold mb-3">
-  🟢 Atualização diária das ofertas
-</p>
-
-<h1 className="text-4xl md:text-6xl font-black leading-tight">
-  Compare preços antes de ir ao supermercado.
-</h1>
-
-<p className="mt-5 text-slate-200 text-lg leading-relaxed">
-  Descubra onde os produtos que você procura estão mais baratos,
-  escolha onde comprar melhor e economize nas compras do dia a dia.
-</p>
-
-<p className="mt-5 text-base font-semibold text-emerald-200">
-  Zaffari • Carrefour • Atacadão • Sam's Club
-</p>
-  </div>
+      <HomeHero />
+      <section className="mt-12">
+  <QuickCategories />
 </section>
-<form method="get" className="rounded-3xl border border-slate-200 bg-white p-5 shadow-lg">
-  <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-    <div>
-      <div className="text-sm font-bold text-slate-900">
-        Escolha sua cidade
-      </div>
-      <p className="text-sm text-slate-500">
-        Veja ofertas, rankings e melhores preços por localidade.
-      </p>
-    </div>
-
-    <div className="flex flex-col gap-3 sm:flex-row">
-      <select
-        name="cidade"
-        defaultValue={cidade}
-        className="rounded-xl border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-700"
-      >
-        <option value="">Todas as cidades</option>
-        <option value="Porto Alegre">Porto Alegre</option>
-        <option value="São Paulo">São Paulo</option>
-        <option value="Florianópolis">Florianópolis</option>
-        <option value="Curitiba">Curitiba</option>
-        <option value="Rio de Janeiro">Rio de Janeiro</option>
-        <option value="Belo Horizonte">Belo Horizonte</option>
-        <option value="Recife">Recife</option>
-        <option value="Fortaleza">Fortaleza</option>
-        <option value="Brasília">Brasília</option>
-        <option value="Goiânia">Goiânia</option>
-        <option value="Belém">Belém</option>
-        <option value="Manaus">Manaus</option>
-      </select>
-
-      <button
-        type="submit"
-        className="rounded-xl bg-emerald-600 px-5 py-3 text-sm font-bold text-white hover:bg-emerald-700"
-      >
-        Aplicar
-      </button>
-    </div>
-  </div>
-</form>
-<div className="mt-10 space-y-6">
-      {menorItemCesta && (
-        <section
-  className="rounded-3xl bg-white p-6 shadow-2xl ring-1 ring-slate-200"
-  style={{ border: "4px solid #facc15" }}
->
-          <div className="inline-flex items-center rounded-full bg-orange-100 px-3 py-1 text-xs font-bold text-orange-700">
-            🥇 MAIS BARATO {cidade ? `EM ${cidade.toUpperCase()}` : "DA CIDADE"}
-          </div>
-
-          <div className="mt-2 text-2xl font-extrabold text-slate-900">
-  {menorItemCesta.store.name}
-</div>
-<div className="mt-2 text-lg font-bold text-slate-700">
-  {menorItemCesta.product.name}
-</div>
-
-
-          <div className="mt-3 text-5xl font-black text-emerald-600">
-            {menorItemCesta.price.toLocaleString("pt-BR", {
-              style: "currency",
-              currency: "BRL",
-            })}
-          </div>
-          
-          <p className="mt-2 text-sm text-slate-500">
-  Menor preço encontrado para item de cesta básica cadastrado no BaratoRadar.
-</p>
-
-        </section>
       )}
 
       {melhorOferta && (
