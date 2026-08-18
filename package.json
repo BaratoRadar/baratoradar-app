@@ -19,7 +19,8 @@
     "import:offers:bh": "tsx scripts/import-offers.ts ofertas_bh.csv",
     "import:offers:recife": "tsx scripts/import-offers.ts ofertas_recife.csv",
     "import:offers:fortaleza": "tsx scripts/import-offers.ts ofertas_fortaleza.csv",
-    "connect:grupo-zaffari": "./node_modules/.bin/tsx scripts/connectors/grupo-zaffari.ts"
+    "connect:grupo-zaffari": "./node_modules/.bin/tsx scripts/connectors/grupo-zaffari.ts",
+    "connect:bistek": "./node_modules/.bin/tsx scripts/connectors/bistek.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
