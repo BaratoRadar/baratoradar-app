@@ -8,37 +8,55 @@ datasource db {
 }
 
 model Product {
-  id        String   @id @default(uuid())
-  name      String
-  category  String?
-  createdAt DateTime @default(now())
-  offers    Offer[]
+  id             String   @id @default(uuid())
+  name           String
+  category       String?
+  brand          String?
+  externalId     String?
+  externalSource String?
+  imageUrl       String?
+  url            String?
+  createdAt      DateTime @default(now())
+  offers         Offer[]
+
+  @@unique([externalSource, externalId])
+  @@index([name])
 }
 
 model Store {
   id        String   @id @default(uuid())
   name      String
+  network   String?
   city      String?
+  region    String?
   createdAt DateTime @default(now())
   offers    Offer[]
+
+  @@index([name, city])
 }
 
 model Offer {
-  id         String    @id @default(uuid())
-  price      Float
-  unit       String?
-  region     String?
-  validUntil DateTime?
-  createdAt  DateTime  @default(now())
-  productId  String
-  storeId    String
-  city       String?
-  source     String    @default("manual")
-  updatedAt  DateTime? @updatedAt
-  product    Product   @relation(fields: [productId], references: [id])
-  store      Store     @relation(fields: [storeId], references: [id])
+  id                String    @id @default(uuid())
+  price             Float
+  listPrice         Float?
+  unit              String?
+  region            String?
+  validUntil        DateTime?
+  available         Boolean   @default(true)
+  availableQuantity Int?
+  createdAt         DateTime  @default(now())
+  productId         String
+  storeId           String
+  city              String?
+  source            String    @default("manual")
+  updatedAt         DateTime? @updatedAt
+
+  product Product @relation(fields: [productId], references: [id])
+  store   Store   @relation(fields: [storeId], references: [id])
 
   @@index([productId])
   @@index([storeId])
   @@index([city])
+  @@index([productId, storeId])
+  @@index([createdAt])
 }

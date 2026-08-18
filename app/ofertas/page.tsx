@@ -184,7 +184,7 @@ const offers = await prisma.offer.findMany({
                   {o.region ?? "-"}
                 </td>
                 <td className="px-4 py-3 text-xs font-semibold">
-                {o.source === "scraper" ? (
+                {o.source === "scraper" || o.source.startsWith("vtex:") ? (
                 <span className="rounded-full bg-emerald-100 px-2 py-1 text-emerald-700">
                 🟢 Automática
                 </span>

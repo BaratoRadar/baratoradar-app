@@ -256,7 +256,6 @@ const painelProteinas = [
       <section className="mt-12">
   <QuickCategories />
 </section>
-      )}
 
       {melhorOferta && (
        <section
@@ -340,7 +339,6 @@ const painelProteinas = [
     )}
   </div>
 </section>
-</div>
 
 <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-xl">
         <div className="flex items-end justify-between">
