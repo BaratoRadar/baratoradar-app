@@ -1,17 +1,20 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-
+import { activeOfferWhere } from "@/lib/active-offers";
 export async function GET() {
   try {
     const ofertas = await prisma.offer.findMany({
-      include: {
-        product: true,
-        store: true,
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
+  where: {
+    ...activeOfferWhere(),
+  },
+  include: {
+    product: true,
+    store: true,
+  },
+  orderBy: {
+    createdAt: "desc",
+  },
+});
 
     return NextResponse.json(
       ofertas.map((o) => ({

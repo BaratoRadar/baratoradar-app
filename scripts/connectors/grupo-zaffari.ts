@@ -68,7 +68,8 @@ type NormalizedProduct = {
 
 async function fetchPage(
   from: number,
-  to: number
+  to: number,
+  maxRetries = 3
 ): Promise<VtexProduct[]> {
   const url = new URL(CONFIG.baseUrl);
 
@@ -76,22 +77,57 @@ async function fetchPage(
   url.searchParams.set("_from", String(from));
   url.searchParams.set("_to", String(to));
 
-  console.log(`Buscando ${from}-${to}...`);
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    console.log(
+      `Buscando ${from}-${to}...${
+        attempt > 1 ? ` tentativa ${attempt}/${maxRetries}` : ""
+      }`
+    );
 
-  const response = await fetch(url, {
-    headers: {
-      Accept: "application/json",
-      "User-Agent": "BaratoRadar/1.0",
-    },
-  });
+    try {
+      const response = await fetch(url, {
+        headers: {
+          Accept: "application/json",
+          "User-Agent": "BaratoRadar/1.0",
+        },
+      });
 
-  if (!response.ok) {
-    throw new Error(
-      `HTTP ${response.status} - ${await response.text()}`
+      if (response.ok) {
+        return (await response.json()) as VtexProduct[];
+      }
+
+      const body = await response.text();
+
+      console.warn(
+        `HTTP ${response.status} na página ${from}-${to}`
+      );
+
+      if (
+        response.status < 500 ||
+        attempt === maxRetries
+      ) {
+        throw new Error(
+          `HTTP ${response.status} - ${body}`
+        );
+      }
+    } catch (error) {
+      if (attempt === maxRetries) {
+        throw error;
+      }
+
+      console.warn(
+        `Falha temporária. Nova tentativa em ${attempt * 2}s...`
+      );
+    }
+
+    await new Promise((resolve) =>
+      setTimeout(resolve, attempt * 2000)
     );
   }
 
-  return (await response.json()) as VtexProduct[];
+  throw new Error(
+    `Não foi possível buscar a página ${from}-${to}`
+  );
 }
 
 function mapCategory(product: VtexProduct): string {

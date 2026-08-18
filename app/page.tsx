@@ -3,7 +3,7 @@ import Link from "next/link";
 import QuickCategories from "@/components/QuickCategories";
 import HomeHero from "@/components/home/HomeHero";
 import { prisma } from "@/lib/prisma";
-
+import { activeOfferWhere } from "@/lib/active-offers";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 export const fetchCache = "force-no-store";
@@ -21,14 +21,17 @@ export default async function HomePage({
   const cidade = (sp?.cidade ?? "").trim();
 
   const offers = await prisma.offer.findMany({
-    where: cidade
-      ? {
-          city: {
-            equals: cidade,
-            mode: "insensitive",
-          },
-        }
-      : {},
+    where: {
+  ...activeOfferWhere(),
+  ...(cidade
+    ? {
+        city: {
+          equals: cidade,
+          mode: "insensitive",
+        },
+      }
+    : {}),
+},
     include: {
       product: true,
       store: true,
@@ -46,6 +49,7 @@ export default async function HomePage({
 );
 const menorItemCesta = await prisma.offer.findFirst({
   where: {
+    ...activeOfferWhere(),
     ...(cidade
       ? {
           city: {
@@ -191,6 +195,7 @@ return {
   const melhorOferta = offers[0] ?? null;
 const proteinas = await prisma.offer.findMany({
   where: {
+    ...activeOfferWhere(),
     product: {
       category: "Proteínas",
     },

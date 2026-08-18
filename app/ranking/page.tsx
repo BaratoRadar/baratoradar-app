@@ -3,7 +3,7 @@ export const revalidate = 0;
 export const fetchCache = "force-no-store";
 
 import { prisma } from "@/lib/prisma";
-
+import { activeOfferWhere } from "@/lib/active-offers";
 const CESTA_BASICA = [
   "Arroz 5kg",
   "Feijão preto 1kg",
@@ -35,6 +35,7 @@ export default async function RankingPage({
 
   const offers = await prisma.offer.findMany({
     where: {
+          ...activeOfferWhere(),
       product: {
         name: {
           in: CESTA_BASICA,

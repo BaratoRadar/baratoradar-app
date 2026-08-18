@@ -3,7 +3,7 @@ export const revalidate = 0;
 export const fetchCache = "force-no-store";
 
 import { prisma } from "@/lib/prisma";
-
+import { activeOfferWhere } from "@/lib/active-offers";
 type SP = {
   q?: string;
   cidade?: string;
@@ -21,6 +21,7 @@ export default async function ProteinasPage({
 
   const offers = await prisma.offer.findMany({
     where: {
+          ...activeOfferWhere(),
       product: {
         category: "Proteínas",
         ...(q

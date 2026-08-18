@@ -3,7 +3,7 @@ export const revalidate = 0;
 export const fetchCache = "force-no-store";
 
 import { prisma } from "@/lib/prisma";
-
+import { activeOfferWhere } from "@/lib/active-offers";
 function slugify(text: string) {
   return text
     .normalize("NFD")
@@ -30,6 +30,7 @@ export default async function OfertasPage({
   const regiao = (sp?.regiao ?? "").trim();
 const offers = await prisma.offer.findMany({
   where: {
+        ...activeOfferWhere(),
     ...(busca
       ? {
           product: {
@@ -61,7 +62,11 @@ const offers = await prisma.offer.findMany({
     product: true,
     store: true,
   },
-  orderBy: { price: "asc" },
+  orderBy: {
+  product: {
+    name: "asc",
+  },
+},
 });
   const uniqueOffers = Array.from(
   new Map(

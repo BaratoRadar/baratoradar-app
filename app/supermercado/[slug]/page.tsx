@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { activeOfferWhere } from "@/lib/active-offers";
 import ClickButtons from "@/app/components/ClickButtons";
 export default async function Page({
   params,
@@ -9,11 +10,12 @@ export default async function Page({
   const storeName = decodeURIComponent(p.slug);
 
   const offers = await prisma.offer.findMany({
-    where: {
-      store: {
-        name: storeName,
-      },
+  where: {
+    ...activeOfferWhere(),
+    store: {
+      name: storeName,
     },
+  },
     include: {
       product: true,
       store: true,
