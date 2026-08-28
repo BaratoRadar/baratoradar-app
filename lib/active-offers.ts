@@ -1,6 +1,6 @@
 export function activeOfferSince() {
   const since = new Date();
-  since.setHours(since.getHours() - 24);
+  since.setHours(since.getHours() - 48);
 
   return since;
 }
