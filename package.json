@@ -23,7 +23,8 @@
     "connect:bistek": "./node_modules/.bin/tsx scripts/connectors/bistek.ts",
     "connect:rissul": "./node_modules/.bin/tsx scripts/connectors/rissul.ts",
     "connect:asun": "./node_modules/.bin/tsx scripts/connectors/asun.ts",
-    "connect:samsclub": "./node_modules/.bin/tsx scripts/connectors/sams-club.ts"
+    "connect:samsclub": "./node_modules/.bin/tsx scripts/connectors/sams-club.ts",
+    "connect:desco": "./node_modules/.bin/tsx scripts/connectors/desco.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
