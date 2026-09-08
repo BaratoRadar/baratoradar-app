@@ -1,6 +1,64 @@
 import { prisma } from "./prisma";
 
-export async function findOrCreateStore(
+
+function isTransientDatabaseError(error: unknown): boolean {
+  const value = error as {
+    code?: string;
+    message?: string;
+  };
+
+  const message = value?.message ?? "";
+
+  return (
+    value?.code === "P1001" ||
+    value?.code === "P1017" ||
+    message.includes("Can't reach database server") ||
+    message.includes("Server has closed the connection") ||
+    message.includes("Connection terminated unexpectedly") ||
+    message.includes("Connection reset") ||
+    message.includes("ECONNRESET")
+  );
+}
+
+async function withDatabaseRetry<T>(
+  operation: () => Promise<T>,
+  label: string,
+  maxRetries = 5
+): Promise<T> {
+  let lastError: unknown;
+
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      return await operation();
+    } catch (error) {
+      lastError = error;
+
+      if (
+        !isTransientDatabaseError(error) ||
+        attempt === maxRetries
+      ) {
+        throw error;
+      }
+
+      const delaySeconds =
+        [2, 5, 10, 20][attempt - 1] ?? 20;
+
+      console.warn(
+        `Banco temporariamente indisponível em ${label}. ` +
+        `Tentativa ${attempt}/${maxRetries}. ` +
+        `Nova tentativa em ${delaySeconds}s...`
+      );
+
+      await new Promise((resolve) =>
+        setTimeout(resolve, delaySeconds * 1000)
+      );
+    }
+  }
+
+  throw lastError;
+}
+
+async function findOrCreateStoreInternal(
   name: string,
   city: string,
   network?: string,
@@ -40,7 +98,7 @@ export async function findOrCreateStore(
   });
 }
 
-export async function findOrCreateProduct(
+async function findOrCreateProductInternal(
   name: string,
   category: string,
   options?: {
@@ -109,7 +167,7 @@ export async function findOrCreateProduct(
   });
 }
 
-export async function saveOrUpdateOffer(params: {
+async function saveOrUpdateOfferInternal(params: {
   productId: string;
   storeId: string;
   price: number;
@@ -177,4 +235,55 @@ export async function saveOrUpdateOffer(params: {
   });
 
   return "created";
+}
+
+export async function findOrCreateStore(
+  name: string,
+  city: string,
+  network?: string,
+  region?: string
+) {
+  return withDatabaseRetry(
+    () =>
+      findOrCreateStoreInternal(
+        name,
+        city,
+        network,
+        region
+      ),
+    `findOrCreateStore:${name}`
+  );
+}
+
+export async function findOrCreateProduct(
+  name: string,
+  category: string,
+  options?: {
+    externalId?: string;
+    externalSource?: string;
+    brand?: string;
+    imageUrl?: string;
+    url?: string;
+  }
+) {
+  return withDatabaseRetry(
+    () =>
+      findOrCreateProductInternal(
+        name,
+        category,
+        options
+      ),
+    `findOrCreateProduct:${name}`
+  );
+}
+
+export async function saveOrUpdateOffer(
+  params: Parameters<
+    typeof saveOrUpdateOfferInternal
+  >[0]
+) {
+  return withDatabaseRetry(
+    () => saveOrUpdateOfferInternal(params),
+    `saveOrUpdateOffer:${params.productId}`
+  );
 }
