@@ -9,19 +9,17 @@ export default function HomeHero() {
 
       <div className="relative mx-auto max-w-4xl text-center">
 
-        <p className="inline-flex rounded-full border border-amber-200 bg-amber-50 px-4 py-1.5 text-xs font-bold tracking-wide text-amber-800">
-          🟡 Em teste • Porto Alegre é nossa cidade piloto
-        </p>
 
-        <h1 className="mt-10 text-5xl font-black tracking-[-0.05em] text-slate-950 md:text-7xl">
+
+        <h1 className="text-5xl font-black tracking-[-0.05em] text-slate-950 md:text-7xl">
           Comprar bem começa comparando.
         </h1>
 
-        <h2 className="mt-3 text-3xl font-black text-emerald-700 md:text-5xl">
-          Antes de sair de casa.
+        <h2 className="mt-2 text-2xl font-black leading-tight text-emerald-700 md:text-4xl">
+          Antes de sair de casa, descubra onde seu dinheiro vale mais.
         </h2>
 
-        <p className="mx-auto mt-10 max-w-3xl text-xl leading-9 text-slate-600">
+        <p className="mx-auto mt-6 max-w-3xl text-xl leading-9 text-slate-600">
           Enquanto você vive o seu dia, o BaratoRadar pesquisa os preços dos
           principais supermercados para mostrar onde vale mais a pena comprar.
         </p>
@@ -35,12 +33,6 @@ export default function HomeHero() {
             Ver onde comprar melhor →
           </Link>
 
-          <Link
-            href="/ofertas"
-            className="rounded-2xl border border-slate-300 bg-white px-10 py-5 text-lg font-bold text-slate-700 transition hover:bg-slate-50"
-          >
-            Explorar ofertas
-          </Link>
 
         </div>
 

@@ -1,12 +1,6 @@
 import Link from "next/link";
 
-const nav = [
-  { href: "/", label: "🏠 Início" },
-  { href: "/ofertas", label: "🔥 Ofertas" },
-  { href: "/proteinas", label: "🥚 Proteínas" },
-  { href: "/cesta-basica-regiao", label: "🛒 Cesta básica" },
-  { href: "/cesta-basica-ranking", label: "📊 Rankings" },
-];
+
 
 export default function Header() {
   return (
@@ -30,17 +24,7 @@ export default function Header() {
 </div>
   </div>
 
-  <nav className="grid w-full grid-cols-2 gap-3 sm:grid-cols-3 md:flex md:flex-wrap md:items-center md:gap-3">
-    {nav.map((item) => (
-      <Link
-        key={item.href}
-        href={item.href}
-        className="flex min-w-[135px] items-center justify-center rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-white px-4 py-3 text-center text-sm font-extrabold text-emerald-800 shadow-sm transition hover:-translate-y-0.5 hover:border-emerald-400 hover:bg-emerald-100 hover:shadow-md"
-      >
-        {item.label}
-      </Link>
-    ))}
-  </nav>
+
 </div>
     </header>
   );
