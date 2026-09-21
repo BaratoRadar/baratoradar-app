@@ -192,7 +192,45 @@ return {
 })
 .filter((item) => item.winner);
 
-  const melhorOferta = offers[0] ?? null;
+  const destaqueRadar = await prisma.offer.findFirst({
+  where: {
+    ...activeOfferWhere(),
+    ...(cidade
+      ? {
+          city: {
+            equals: cidade,
+            mode: "insensitive",
+          },
+        }
+      : {}),
+    price: {
+      gte: 2,
+    },
+    product: {
+      OR: [
+        {
+          category: {
+            contains: "Prote",
+            mode: "insensitive",
+          },
+        },
+        {
+          category: {
+            contains: "Cesta",
+            mode: "insensitive",
+          },
+        },
+      ],
+    },
+  },
+  include: {
+    product: true,
+    store: true,
+  },
+  orderBy: {
+    price: "asc",
+  },
+});
 const proteinas = await prisma.offer.findMany({
   where: {
     ...activeOfferWhere(),
@@ -207,52 +245,171 @@ const proteinas = await prisma.offer.findMany({
   orderBy: { price: "asc" },
 });
 
+const nomeProduto = (nome: string) =>
+  nome.toLowerCase();
+
+const contemAlgum = (
+  nome: string,
+  termos: string[]
+) => termos.some((termo) => nome.includes(termo));
+
 const painelProteinas = [
   {
     label: "Ovos",
     icon: "🥚",
-    offer: proteinas.find((o) =>
-      o.product.name.toLowerCase().includes("ovo")
-    ),
+    offer: proteinas.find((o) => {
+      const n = nomeProduto(o.product.name);
+
+      return contemAlgum(n, [
+        "ovo branco",
+        "ovos brancos",
+        "ovo vermelho",
+        "ovos vermelhos",
+        "ovo caipira",
+        "ovos caipiras",
+        "dúzia de ovos",
+        "duzia de ovos",
+        "bandeja de ovos",
+        "ovos bandeja",
+      ]);
+    }),
   },
   {
     label: "Frango",
     icon: "🐔",
-    offer: proteinas.find(
-      (o) =>
-        o.product.name.toLowerCase().includes("frango") ||
-        o.product.name.toLowerCase().includes("coxa")
-    ),
+    offer: proteinas.find((o) => {
+      const n = nomeProduto(o.product.name);
+
+      return (
+        contemAlgum(n, [
+          "frango inteiro",
+          "coxa de frango",
+          "coxa frango",
+          "sobrecoxa",
+          "peito de frango",
+          "peito frango",
+          "filé de peito",
+          "file de peito",
+          "asa de frango",
+          "asa frango",
+          "coxinha da asa",
+        ]) &&
+        !contemAlgum(n, [
+          "hambúrguer",
+          "hamburguer",
+          "empanad",
+          "steak",
+          "patê",
+          "pate",
+          "sopa",
+          "instantâne",
+          "instantane",
+          "ração",
+          "racao",
+        ])
+      );
+    }),
   },
   {
     label: "Suínos",
     icon: "🐷",
-    offer: proteinas.find(
-      (o) =>
-        o.product.name.toLowerCase().includes("suíno") ||
-        o.product.name.toLowerCase().includes("suino") ||
-        o.product.name.toLowerCase().includes("lombo")
-    ),
+    offer: proteinas.find((o) => {
+      const n = nomeProduto(o.product.name);
+
+      return (
+        contemAlgum(n, [
+          "costela suína",
+          "costela suina",
+          "lombo suíno",
+          "lombo suino",
+          "pernil suíno",
+          "pernil suino",
+          "bisteca suína",
+          "bisteca suina",
+          "copa lombo",
+        ]) &&
+        !contemAlgum(n, [
+          "ração",
+          "racao",
+          "sabor",
+        ])
+      );
+    }),
   },
   {
     label: "Bovinos",
     icon: "🥩",
-    offer: proteinas.find(
-      (o) =>
-        o.product.name.toLowerCase().includes("bovina") ||
-        o.product.name.toLowerCase().includes("alcatra") ||
-        o.product.name.toLowerCase().includes("coxão")
-    ),
+    offer: proteinas.find((o) => {
+      const n = nomeProduto(o.product.name);
+
+      return (
+        contemAlgum(n, [
+          "alcatra",
+          "coxão mole",
+          "coxao mole",
+          "coxão duro",
+          "coxao duro",
+          "patinho",
+          "maminha",
+          "picanha",
+          "contrafilé",
+          "contrafile",
+          "acém",
+          "acem",
+          "paleta bovina",
+          "costela bovina",
+        ]) &&
+        !contemAlgum(n, [
+          "hambúrguer",
+          "hamburguer",
+          "caldo",
+          "macarrão",
+          "macarrao",
+          "ração",
+          "racao",
+        ])
+      );
+    }),
   },
   {
     label: "Pescados",
     icon: "🐟",
-    offer: proteinas.find(
-      (o) =>
-        o.product.name.toLowerCase().includes("peixe") ||
-        o.product.name.toLowerCase().includes("tilápia") ||
-        o.product.name.toLowerCase().includes("filé")
-    ),
+    offer: proteinas.find((o) => {
+      const n = nomeProduto(o.product.name);
+
+      return (
+        contemAlgum(n, [
+          "filé de tilápia",
+          "file de tilapia",
+          "tilápia",
+          "tilapia",
+          "filé de merluza",
+          "file de merluza",
+          "merluza",
+          "salmão",
+          "salmao",
+          "pescada",
+          "sardinha inteira",
+        ]) &&
+        !contemAlgum(n, [
+          "ração",
+          "racao",
+          "gato",
+          "gatos",
+          "cão",
+          "cães",
+          "cao",
+          "caes",
+          "alimento",
+          "pet",
+          "empanad",
+          "nugget",
+          "bolinho",
+          "hambúrguer",
+          "hamburguer",
+        ])
+      );
+    }),
   },
 ];
   return (
@@ -262,28 +419,86 @@ const painelProteinas = [
   <QuickCategories />
 </section>
 
-      {melhorOferta && (
+<section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+  <Link
+    href="/ofertas"
+    className="group rounded-3xl border border-orange-100 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
+  >
+    <div className="text-3xl">🔥</div>
+    <div className="mt-3 text-lg font-black text-slate-900">
+      Ofertas do dia
+    </div>
+    <p className="mt-1 text-sm text-slate-500">
+      Veja os menores preços encontrados pelo radar.
+    </p>
+  </Link>
+
+  <Link
+    href="/proteinas"
+    className="group rounded-3xl border border-emerald-100 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
+  >
+    <div className="text-3xl">🥩</div>
+    <div className="mt-3 text-lg font-black text-slate-900">
+      Proteínas
+    </div>
+    <p className="mt-1 text-sm text-slate-500">
+      Compare carnes, frango, ovos e pescados.
+    </p>
+  </Link>
+
+  <Link
+    href="/cesta-basica-regiao"
+    className="group rounded-3xl border border-sky-100 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
+  >
+    <div className="text-3xl">🧺</div>
+    <div className="mt-3 text-lg font-black text-slate-900">
+      Cesta básica
+    </div>
+    <p className="mt-1 text-sm text-slate-500">
+      Descubra onde sua cesta custa menos.
+    </p>
+  </Link>
+
+  <Link
+    href="/cesta-basica-ranking"
+    className="group rounded-3xl border border-violet-100 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
+  >
+    <div className="text-3xl">📊</div>
+    <div className="mt-3 text-lg font-black text-slate-900">
+      Rankings
+    </div>
+    <p className="mt-1 text-sm text-slate-500">
+      Compare supermercados e regiões.
+    </p>
+  </Link>
+</section>
+
+      {destaqueRadar && (
        <section
   className="rounded-3xl bg-white p-6 shadow-2xl ring-1 ring-slate-200"
   style={{ border: "4px solid #fb923c" }}
 >
           <div className="inline-flex items-center rounded-full bg-orange-100 px-3 py-1 text-xs font-bold text-orange-700">
-            🔥 MELHOR OFERTA DO DIA
+            🔎 DESTAQUE DO RADAR
           </div>
 
           <div className="mt-2 text-2xl font-extrabold text-slate-900">
-            {melhorOferta.product.name}
+            {destaqueRadar.product.name}
           </div>
 
           <div className="mt-3 text-5xl font-black text-emerald-600">
-  {melhorOferta.price.toLocaleString("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  })}
+           {destaqueRadar.price.toLocaleString("pt-BR", {
+            style: "currency",
+            currency: "BRL",
+           })}
 </div>
       <div className="mt-3 text-sm font-semibold text-slate-600">
-  {melhorOferta.store.name} • {melhorOferta.city} •{" "}
-  {melhorOferta.region}
+  {destaqueRadar.store.name} • {destaqueRadar.city}
+{destaqueRadar.region &&
+destaqueRadar.region.toLowerCase() !==
+  destaqueRadar.city?.toLowerCase()
+  ? ` • ${destaqueRadar.region}`
+  : ""}
 </div>    
         </section>
       )}
@@ -345,6 +560,54 @@ const painelProteinas = [
   </div>
 </section>
 
+<section className="mt-12">
+        <div className="flex items-end justify-between">
+          <h2 className="text-2xl font-bold text-slate-900">
+            Melhores ofertas
+          </h2>
+
+          <Link
+            href={`/ofertas${cidade ? `?cidade=${encodeURIComponent(cidade)}` : ""}`}
+            className="text-sm font-semibold text-green-700 hover:text-green-800"
+          >
+            Ver todas
+          </Link>
+        </div>
+
+        <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          {uniqueOffers.map((o) => (
+            <div
+              key={o.id}
+              className="rounded-3xl border border-slate-200 bg-white p-5 shadow-md transition-all duration-200 hover:-translate-y-1 hover:shadow-2xl"
+            >
+              <div className="text-xs font-semibold text-slate-500">
+                <span className="inline-flex rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-700">
+  {o.product.category ?? "Oferta"}
+</span>
+              </div>
+
+              <div className="mt-2 text-lg leading-snug font-bold text-slate-900">
+                {o.product.name}
+              </div>
+
+              <div className="mt-2 text-xs text-slate-500">
+                {o.store.name} • {o.city ?? "Sem cidade"} •{" "}
+                {o.region ?? "Sem região"}
+              </div>
+
+              <div className="mt-3 text-3xl font-black text-emerald-600">
+                {o.price.toLocaleString("pt-BR", {
+                  style: "currency",
+                  currency: "BRL",
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      
+    
 <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-xl">
         <div className="flex items-end justify-between">
           <h2 className="text-2xl font-bold text-slate-900">
@@ -402,96 +665,7 @@ const painelProteinas = [
         </div>
       </section>
 
-      <section className="mt-12">
-        <div className="flex items-end justify-between">
-          <h2 className="text-2xl font-bold text-slate-900">
-            Melhores ofertas
-          </h2>
-
-          <Link
-            href={`/ofertas${cidade ? `?cidade=${encodeURIComponent(cidade)}` : ""}`}
-            className="text-sm font-semibold text-green-700 hover:text-green-800"
-          >
-            Ver todas
-          </Link>
-        </div>
-
-        <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          {uniqueOffers.map((o) => (
-            <div
-              key={o.id}
-              className="rounded-3xl border border-slate-200 bg-white p-5 shadow-md transition-all duration-200 hover:-translate-y-1 hover:shadow-2xl"
-            >
-              <div className="text-xs font-semibold text-slate-500">
-                <span className="inline-flex rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-700">
-  {o.product.category ?? "Oferta"}
-</span>
-              </div>
-
-              <div className="mt-2 text-lg leading-snug font-bold text-slate-900">
-                {o.product.name}
-              </div>
-
-              <div className="mt-2 text-xs text-slate-500">
-                {o.store.name} • {o.city ?? "Sem cidade"} •{" "}
-                {o.region ?? "Sem região"}
-              </div>
-
-              <div className="mt-3 text-3xl font-black text-emerald-600">
-                {o.price.toLocaleString("pt-BR", {
-                  style: "currency",
-                  currency: "BRL",
-                })}
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="mt-12">
-        <h2 className="text-2xl font-bold text-slate-900">Categorias</h2>
-
-        <div className="mt-6 grid gap-4 md:grid-cols-3">
-          <Link
-            href="/proteinas"
-            className="rounded-2xl border bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:bg-slate-50"
-          >
-            <div className="text-2xl">🥩</div>
-            <div className="mt-3 text-lg font-bold text-slate-900">
-              Proteínas
-            </div>
-            <p className="mt-2 text-sm text-slate-500">
-  Frango, ovos, carne bovina e mais.
-</p>
-          </Link>
-
-          <Link
-            href="/cesta-basica"
-            className="rounded-2xl border bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:bg-slate-50"
-          >
-            <div className="text-2xl">🧺</div>
-            <div className="mt-3 text-lg font-bold text-slate-900">
-              Cesta básica
-            </div>
-            <p className="mt-1 text-sm text-slate-600">
-              Arroz, feijão, café, erva-mate e macarrão.
-            </p>
-          </Link>
-
-          <Link
-            href="/limpeza"
-            className="rounded-2xl border bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:bg-slate-50"
-          >
-            <div className="text-2xl">🧴</div>
-            <div className="mt-3 text-lg font-bold text-slate-900">
-              Limpeza
-            </div>
-            <p className="mt-1 text-sm text-slate-600">
-              Sabão, detergente, água sanitária e desinfetante.
-            </p>
-          </Link>
-        </div>
-      </section>
-    </main>
+      
+</main>
   );
 }
