@@ -1,0 +1,33 @@
+name: Mambo Sao Paulo Connector
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "30 11 * * *"
+
+jobs:
+  connect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    steps:
+      - name: Baixar repositorio
+        uses: actions/checkout@v4
+
+      - name: Instalar Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm install
+
+      - name: Gerar Prisma Client
+        run: npx prisma generate
+
+      - name: Rodar connector Mambo Sao Paulo
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          NODE_TLS_REJECT_UNAUTHORIZED: "0"
+        run: npm run connect:mambo:sp

@@ -26,7 +26,8 @@
     "connect:samsclub": "./node_modules/.bin/tsx scripts/connectors/sams-club.ts",
     "connect:samsclub:sp": "./node_modules/.bin/tsx scripts/connectors/sams-club-sp.ts",
     "connect:desco": "./node_modules/.bin/tsx scripts/connectors/desco.ts",
-    "connect:stok": "./node_modules/.bin/tsx scripts/connectors/stok.ts"
+    "connect:stok": "./node_modules/.bin/tsx scripts/connectors/stok.ts",
+    "connect:mambo:sp": "./node_modules/.bin/tsx scripts/connectors/mambo-sp.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
