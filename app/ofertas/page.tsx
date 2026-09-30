@@ -12,8 +12,84 @@ function slugify(text: string) {
     .replace(/\s+/g, "-");
 }
 
+
+function normalizarNome(nome: string) {
+  return nome
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
+function produtoDaCategoria(
+  nomeProduto: string,
+  categoria: string
+) {
+  const n = normalizarNome(nomeProduto);
+  const c = normalizarNome(categoria);
+
+  if (c === "leite") {
+    return (
+      /^leite\b/.test(n) &&
+      !/fermentado|condensado|creme|bebida lactea|doce de leite|coco/.test(n)
+    );
+  }
+
+  if (c === "arroz") {
+    return (
+      /^arroz\b/.test(n) &&
+      !/biscoito|bolacha|bebida|farinha|massa pronta/.test(n)
+    );
+  }
+
+  if (c === "feijao") {
+    return (
+      /^feijao\b/.test(n) &&
+      !/sopa|caldo|prato pronto|tempero/.test(n)
+    );
+  }
+
+  if (c === "oleo") {
+    return (
+      /^oleo\b/.test(n) &&
+      /soja|canola|milho|girassol/.test(n) &&
+      !/motor|corporal|cabelo|essencial/.test(n)
+    );
+  }
+
+  if (c === "ovos") {
+    return (
+      /^(ovo|ovos)\b/.test(n) &&
+      !/chocolate|pascoa|massa|biscoito/.test(n)
+    );
+  }
+
+  if (c === "frango") {
+    return (
+      /^(frango inteiro|coxa de frango|coxa frango|sobrecoxa|peito de frango|peito frango|file de peito|filezinho de sassami|sassami|asa de frango|asa frango|coxinha da asa)\b/.test(n) &&
+      !/vegetal|alimento canino|alimento para caes|racao|sabor frango|cremoso|pizza|massa|macarrao|sopa|caldo|empanad|hamburguer|pate|prato pronto|menu/.test(n)
+    );
+  }
+
+  if (c === "carne") {
+    return (
+      /^(carne bovina|carne moida|acem|alcatra|contrafile|contra file|coxao mole|coxao duro|patinho|picanha|maminha|file mignon|lagarto|paleta bovina|musculo bovino|costela bovina|peito bovino)\b/.test(n) &&
+      !/hamburguer|linguica|empanad|pizza|massa|sopa|caldo|prato pronto|menu/.test(n)
+    );
+  }
+
+  if (c === "cafe") {
+    return (
+      /^cafe\b/.test(n) &&
+      !/cafeteira|maquina|licor|bebida pronta|sorvete|chocolate|bala|cafeina/.test(n)
+    );
+  }
+
+  return false;
+}
+
 type SP = {
   busca?: string;
+  categoria?: string;
   cidade?: string;
   regiao?: string;
 };
@@ -26,6 +102,7 @@ export default async function OfertasPage({
   const sp = searchParams instanceof Promise ? await searchParams : searchParams;
 
   const busca = (sp?.busca ?? "").trim();
+  const categoria = (sp?.categoria ?? "").trim();
   const cidade = (sp?.cidade ?? "").trim();
   const regiao = (sp?.regiao ?? "").trim();
 const offers = await prisma.offer.findMany({
@@ -68,9 +145,18 @@ const offers = await prisma.offer.findMany({
   },
 },
 });
+  const filteredOffers = categoria
+    ? offers.filter((offer) =>
+        produtoDaCategoria(
+          offer.product.name,
+          categoria
+        )
+      )
+    : offers;
+
   const uniqueOffers = Array.from(
   new Map(
-    offers.map((offer) => [
+    filteredOffers.map((offer) => [
       `${offer.product.name.toLowerCase()}-${offer.store.name.toLowerCase()}-${offer.price}-${offer.city?.toLowerCase()}-${offer.region?.toLowerCase()}`,
       offer,
     ])
@@ -192,7 +278,7 @@ const offers = await prisma.offer.findMany({
               </tr>
             ))}
 
-            {offers.length === 0 && (
+            {uniqueOffers.length === 0 && (
               <tr>
                 <td colSpan={5} className="px-4 py-6 text-slate-600">
                   Nenhuma oferta encontrada.

@@ -1,3 +1,4 @@
+import "./globals.css";
 import SiteChrome from "../components/SiteChrome";
 import { Analytics } from "@vercel/analytics/react";
 

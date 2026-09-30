@@ -20,9 +20,12 @@ export default async function HomePage({
   const sp = searchParams instanceof Promise ? await searchParams : searchParams;
   const cidade = (sp?.cidade ?? "").trim();
 
-  const offers = await prisma.offer.findMany({
+  const offersPromise = prisma.offer.findMany({
     where: {
   ...activeOfferWhere(),
+  price: {
+    gte: 1,
+  },
   ...(cidade
     ? {
         city: {
@@ -39,6 +42,205 @@ export default async function HomePage({
     orderBy: { price: "asc" },
     take: 8,
   });
+  // Cesta de referência baseada nos 10 grupos oficiais.
+  // Cada grupo usa um produto comparável e apenas ofertas ativas.
+  const normalizarNome = (nome: string) =>
+    nome
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+
+  const gruposCesta = [
+    {
+      label: "Feijão",
+      match: (n: string) =>
+        /^feijao\b/.test(n) && /\b1\s*kg\b/.test(n),
+    },
+    {
+      label: "Arroz",
+      match: (n: string) =>
+        /^arroz\b/.test(n) && /\b1\s*kg\b/.test(n),
+    },
+    {
+      label: "Batata",
+      match: (n: string) =>
+        /^batata\b/.test(n) &&
+        /\bkg\b/.test(n) &&
+        !/palito|chips|congelad|frita|pure/.test(n),
+    },
+    {
+      label: "Tomate",
+      match: (n: string) =>
+        /^tomate\b/.test(n) &&
+        /\bkg\b/.test(n) &&
+        !/molho|extrato|pelado|seco/.test(n),
+    },
+    {
+      label: "Banana",
+      match: (n: string) =>
+        /^banana\b/.test(n) &&
+        /\bkg\b/.test(n) &&
+        !/chips|doce|passa/.test(n),
+    },
+    {
+      label: "Amendoim",
+      match: (n: string) =>
+        /^amendoim\b/.test(n) &&
+        /\b500\s*g\b/.test(n),
+    },
+    {
+      label: "Frango",
+      match: (n: string) =>
+        /^(frango inteiro|coxa de frango|sobrecoxa|peito de frango|file de peito de frango)\b/.test(n) &&
+        /\bkg\b/.test(n) &&
+        !/vegetal|cremoso|empanad|hamburguer|pronto|menu/.test(n),
+    },
+    {
+      label: "Leite",
+      match: (n: string) =>
+        /^leite\b/.test(n) &&
+        /\b(uht|longa vida)\b/.test(n) &&
+        /\b1\s*l\b/.test(n) &&
+        !/fermentado|condensado|po\b|coco/.test(n),
+    },
+    {
+      label: "Óleo de soja",
+      match: (n: string) =>
+        /^oleo de soja\b/.test(n) &&
+        /\b900\s*ml\b/.test(n),
+    },
+    {
+      label: "Café",
+      match: (n: string) =>
+        /^cafe\b/.test(n) &&
+        /\b500\s*g\b/.test(n) &&
+        /torrado|moido|tradicional|extraforte|extra forte/.test(n) &&
+        !/soluvel|capsula|bebida|licor/.test(n),
+    },
+  ];
+
+  const cestaOffersPromise = prisma.offer.findMany({
+    where: {
+      ...activeOfferWhere(),
+
+      ...(cidade
+        ? {
+            city: {
+              equals: cidade,
+              mode: "insensitive",
+            },
+          }
+        : {}),
+
+      product: {
+        OR: [
+          {
+            AND: [
+              {
+                OR: [
+                  { name: { startsWith: "Feijão", mode: "insensitive" } },
+                  { name: { startsWith: "Feijao", mode: "insensitive" } },
+                ],
+              },
+              {
+                OR: [
+                  { name: { contains: "1kg", mode: "insensitive" } },
+                  { name: { contains: "1 kg", mode: "insensitive" } },
+                ],
+              },
+            ],
+          },
+          {
+            AND: [
+              { name: { startsWith: "Arroz", mode: "insensitive" } },
+              { name: { contains: "1kg", mode: "insensitive" } },
+            ],
+          },
+          {
+            AND: [
+              { name: { startsWith: "Batata", mode: "insensitive" } },
+              { name: { contains: "Kg", mode: "insensitive" } },
+            ],
+          },
+          { name: { startsWith: "Tomate", mode: "insensitive" } },
+          { name: { startsWith: "Banana", mode: "insensitive" } },
+          {
+            AND: [
+              { name: { startsWith: "Amendoim", mode: "insensitive" } },
+              {
+                OR: [
+                  { name: { contains: "500g", mode: "insensitive" } },
+                  { name: { contains: "500 g", mode: "insensitive" } },
+                ],
+              },
+            ],
+          },
+          { name: { startsWith: "Frango", mode: "insensitive" } },
+          { name: { startsWith: "Coxa de Frango", mode: "insensitive" } },
+          { name: { startsWith: "Sobrecoxa", mode: "insensitive" } },
+          { name: { startsWith: "Peito de Frango", mode: "insensitive" } },
+          { name: { startsWith: "Filé de Peito", mode: "insensitive" } },
+          { name: { startsWith: "File de Peito", mode: "insensitive" } },
+          {
+            AND: [
+              { name: { startsWith: "Leite", mode: "insensitive" } },
+              {
+                OR: [
+                  { name: { contains: "1L", mode: "insensitive" } },
+                  { name: { contains: "1 L", mode: "insensitive" } },
+                ],
+              },
+            ],
+          },
+          {
+            AND: [
+              {
+                OR: [
+                  { name: { startsWith: "Óleo de Soja", mode: "insensitive" } },
+                  { name: { startsWith: "Oleo de Soja", mode: "insensitive" } },
+                ],
+              },
+              {
+                OR: [
+                  { name: { contains: "900ml", mode: "insensitive" } },
+                  { name: { contains: "900 ml", mode: "insensitive" } },
+                ],
+              },
+            ],
+          },
+          {
+            AND: [
+              {
+                OR: [
+                  { name: { startsWith: "Café", mode: "insensitive" } },
+                  { name: { startsWith: "Cafe", mode: "insensitive" } },
+                ],
+              },
+              {
+                OR: [
+                  { name: { contains: "500g", mode: "insensitive" } },
+                  { name: { contains: "500 g", mode: "insensitive" } },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    },
+
+    include: {
+      product: true,
+      store: true,
+    },
+
+    orderBy: { price: "asc" },
+  });
+
+  const [offers, cestaOffers] = await Promise.all([
+    offersPromise,
+    cestaOffersPromise,
+  ]);
+
   const uniqueOffers = Array.from(
   new Map(
     offers.map((offer) => [
@@ -47,154 +249,222 @@ export default async function HomePage({
     ])
   ).values()
 );
-const menorItemCesta = await prisma.offer.findFirst({
-  where: {
-    ...activeOfferWhere(),
-    ...(cidade
-      ? {
-          city: {
-            equals: cidade,
-            mode: "insensitive",
-          },
-        }
-      : {}),
-    product: {
-      category: {
-        contains: "Cesta",
-        mode: "insensitive",
-      },
-    },
-  },
-  include: {
-    product: true,
-    store: true,
-  },
-  orderBy: { price: "asc" },
-});
-  const cestaProducts = await prisma.product.findMany({
-    where: {
-      OR: [
-        { category: "Cesta Básica" },
-        { category: "Cesta básica" },
-        { category: "cesta básica" },
-      ],
-    },
-    include: {
-      offers: {
-        where: cidade
-          ? {
-              city: {
-                equals: cidade,
-                mode: "insensitive",
-              },
-            }
-          : {},
-        include: {
-          store: true,
-        },
-      },
-    },
-  });
-  const cestaProductNames = cestaProducts.map((p) => p.name).join(", ");
-  const storeTotals: Record<string, number> = {};
-
-  for (const product of cestaProducts) {
-    const bestByStore: Record<string, number> = {};
-
-    for (const offer of product.offers) {
-      const store = offer.store.name;
-
-      if (!bestByStore[store] || offer.price < bestByStore[store]) {
-        bestByStore[store] = offer.price;
-      }
-    }
-
-    for (const [store, price] of Object.entries(bestByStore)) {
-      if (!storeTotals[store]) {
-        storeTotals[store] = 0;
-      }
-      storeTotals[store] += price;
-    }
-  }
-
-  const rankingCidade = Object.entries(storeTotals)
-    .map(([store, total]) => ({ store, total }))
-    .sort((a, b) => a.total - b.total);
-
-  const maisBaratoCidade = rankingCidade[0] ?? null;
-
-  const regionStoreTotals: Record<string, Record<string, number>> = {};
-const bestRegionItem: Record<
-  string,
-  Record<string, { productName: string; price: number }>
-> = {};
-  for (const product of cestaProducts) {
-    const bestByRegionStore: Record<string, Record<string, number>> = {};
-
-    for (const offer of product.offers) {
-      if (!offer.region) continue;
-
-      const region = offer.region;
-      const store = offer.store.name;
-if (!bestRegionItem[region]) {
-  bestRegionItem[region] = {};
-}
-
-const currentBest = bestRegionItem[region][store];
-
-if (!currentBest || offer.price < currentBest.price) {
-  bestRegionItem[region][store] = {
-    productName: product.name,
-    price: offer.price,
+  type CestaStore = {
+    store: string;
+    total: number;
+    found: number;
+    required: number;
+    complete: boolean;
+    productName: string | null;
   };
-}
-      if (!bestByRegionStore[region]) {
-        bestByRegionStore[region] = {};
-      }
 
-      if (
-        !bestByRegionStore[region][store] ||
-        offer.price < bestByRegionStore[region][store]
-      ) {
-        bestByRegionStore[region][store] = offer.price;
+  type CestaStoreInternal = CestaStore & {
+    melhores: Record<
+      string,
+      {
+        price: number;
+        productName: string;
       }
+    >;
+  };
+
+  const cestaPorRegiao: Record<
+    string,
+    Record<string, CestaStoreInternal>
+  > = {};
+
+  // Uma única passagem por todas as ofertas.
+  // Para cada região + loja + grupo, guarda apenas
+  // a oferta válida mais barata.
+  for (const offer of cestaOffers) {
+    if (!offer.region) continue;
+
+    const nome = normalizarNome(
+      offer.product.name
+    );
+
+    const grupo = gruposCesta.find((g) =>
+      g.match(nome)
+    );
+
+    if (!grupo) continue;
+
+    const region = offer.region;
+    const store = offer.store.name;
+
+    if (!cestaPorRegiao[region]) {
+      cestaPorRegiao[region] = {};
     }
 
-    for (const [region, stores] of Object.entries(bestByRegionStore)) {
-      if (!regionStoreTotals[region]) {
-        regionStoreTotals[region] = {};
-      }
+    if (!cestaPorRegiao[region][store]) {
+      cestaPorRegiao[region][store] = {
+        store,
+        total: 0,
+        found: 0,
+        required: gruposCesta.length,
+        complete: false,
+        productName: null,
+        melhores: {},
+      };
+    }
 
-      for (const [store, price] of Object.entries(stores)) {
-        if (!regionStoreTotals[region][store]) {
-          regionStoreTotals[region][store] = 0;
-        }
-        regionStoreTotals[region][store] += price;
-      }
+    const result =
+      cestaPorRegiao[region][store];
+
+    const atual = result.melhores[
+      grupo.label
+    ];
+
+    if (
+      !atual ||
+      offer.price < atual.price
+    ) {
+      result.melhores[grupo.label] = {
+        price: offer.price,
+        productName: offer.product.name,
+      };
     }
   }
 
-  const rankingPorRegiao = Object.entries(regionStoreTotals)
+  // Calcula os totais somente a partir dos
+  // 10 melhores itens já selecionados.
+  for (const stores of Object.values(
+    cestaPorRegiao
+  )) {
+    for (const result of Object.values(
+      stores
+    )) {
+      const melhores = Object.values(
+        result.melhores
+      );
+
+      result.found = melhores.length;
+
+      result.total = melhores.reduce(
+        (sum, item) => sum + item.price,
+        0
+      );
+
+      result.complete =
+        result.found === result.required;
+
+      result.productName =
+        melhores[0]?.productName ?? null;
+    }
+  }
+
+  const rankingPorRegiao = Object.entries(
+    cestaPorRegiao
+  )
     .map(([region, stores]) => {
-      const ranking = Object.entries(stores)
-        .map(([store, total]) => ({ store, total }))
-        .sort((a, b) => a.total - b.total);
+      const ranking = Object.values(stores).sort(
+        (a, b) => {
+          // Cestas completas aparecem primeiro.
+          if (a.complete !== b.complete) {
+            return a.complete ? -1 : 1;
+          }
+
+          // Entre parciais, maior cobertura primeiro.
+          if (a.found !== b.found) {
+            return b.found - a.found;
+          }
+
+          return a.total - b.total;
+        }
+      );
 
       const winner = ranking[0] ?? null;
 
-return {
-  region,
-  winner,
-  productName: winner
-    ? bestRegionItem[region]?.[winner.store]?.productName
-    : null,
-};
-})
-.filter((item) => item.winner);
+      return {
+        region,
+        winner,
+        productName:
+          winner?.productName ?? null,
+      };
+    })
+    .filter((item) => item.winner);
 
-  const destaqueRadar = await prisma.offer.findFirst({
+  const destaqueRadarPromise = prisma.offer.findFirst({
+    where: {
+      ...activeOfferWhere(),
+
+      ...(cidade
+        ? {
+            city: {
+              equals: cidade,
+              mode: "insensitive",
+            },
+          }
+        : {}),
+
+      price: {
+        gte: 2,
+      },
+
+      product: {
+        OR: [
+          { name: { startsWith: "Arroz", mode: "insensitive" } },
+          { name: { startsWith: "Feijão", mode: "insensitive" } },
+          { name: { startsWith: "Feijao", mode: "insensitive" } },
+          {
+            AND: [
+              { name: { startsWith: "Leite", mode: "insensitive" } },
+              {
+                OR: [
+                  { name: { contains: "1L", mode: "insensitive" } },
+                  { name: { contains: "1 L", mode: "insensitive" } },
+                ],
+              },
+              {
+                NOT: {
+                  name: {
+                    contains: "Fermentado",
+                    mode: "insensitive",
+                  },
+                },
+              },
+            ],
+          },
+          { name: { startsWith: "Café", mode: "insensitive" } },
+          { name: { startsWith: "Cafe", mode: "insensitive" } },
+          { name: { startsWith: "Óleo de Soja", mode: "insensitive" } },
+          { name: { startsWith: "Oleo de Soja", mode: "insensitive" } },
+          { name: { startsWith: "Ovo ", mode: "insensitive" } },
+          { name: { startsWith: "Ovos ", mode: "insensitive" } },
+          { name: { startsWith: "Frango Inteiro", mode: "insensitive" } },
+          { name: { startsWith: "Coxa de Frango", mode: "insensitive" } },
+          { name: { startsWith: "Sobrecoxa", mode: "insensitive" } },
+          { name: { startsWith: "Peito de Frango", mode: "insensitive" } },
+          { name: { startsWith: "Filé de Peito", mode: "insensitive" } },
+          { name: { startsWith: "File de Peito", mode: "insensitive" } },
+          { name: { startsWith: "Bisteca Suína", mode: "insensitive" } },
+          { name: { startsWith: "Bisteca Suina", mode: "insensitive" } },
+          { name: { startsWith: "Costela Suína", mode: "insensitive" } },
+          { name: { startsWith: "Costela Suina", mode: "insensitive" } },
+          { name: { startsWith: "Alcatra", mode: "insensitive" } },
+          { name: { startsWith: "Patinho", mode: "insensitive" } },
+          { name: { startsWith: "Acém", mode: "insensitive" } },
+          { name: { startsWith: "Acem", mode: "insensitive" } },
+          { name: { startsWith: "Filé de Tilápia", mode: "insensitive" } },
+          { name: { startsWith: "File de Tilapia", mode: "insensitive" } },
+        ],
+      },
+    },
+
+    include: {
+      product: true,
+      store: true,
+    },
+
+    orderBy: {
+      price: "asc",
+    },
+  });
+
+const proteinasPromise = prisma.offer.findMany({
   where: {
     ...activeOfferWhere(),
+
     ...(cidade
       ? {
           city: {
@@ -203,47 +473,82 @@ return {
           },
         }
       : {}),
-    price: {
-      gte: 2,
-    },
+
     product: {
+      category: "Proteínas",
+
       OR: [
-        {
-          category: {
-            contains: "Prote",
-            mode: "insensitive",
-          },
-        },
-        {
-          category: {
-            contains: "Cesta",
-            mode: "insensitive",
-          },
-        },
+        // Ovos
+        { name: { startsWith: "Ovo ", mode: "insensitive" } },
+        { name: { startsWith: "Ovos ", mode: "insensitive" } },
+
+        // Frango
+        { name: { startsWith: "Frango Inteiro", mode: "insensitive" } },
+        { name: { startsWith: "Coxa de Frango", mode: "insensitive" } },
+        { name: { startsWith: "Sobrecoxa", mode: "insensitive" } },
+        { name: { startsWith: "Peito de Frango", mode: "insensitive" } },
+        { name: { startsWith: "Filé de Peito", mode: "insensitive" } },
+        { name: { startsWith: "File de Peito", mode: "insensitive" } },
+        { name: { startsWith: "Sassami", mode: "insensitive" } },
+        { name: { startsWith: "Filezinho de Sassami", mode: "insensitive" } },
+        { name: { startsWith: "Asa de Frango", mode: "insensitive" } },
+        { name: { startsWith: "Coxinha da Asa", mode: "insensitive" } },
+
+        // Suínos
+        { name: { startsWith: "Costela Suína", mode: "insensitive" } },
+        { name: { startsWith: "Costela Suina", mode: "insensitive" } },
+        { name: { startsWith: "Lombo Suíno", mode: "insensitive" } },
+        { name: { startsWith: "Lombo Suino", mode: "insensitive" } },
+        { name: { startsWith: "Pernil Suíno", mode: "insensitive" } },
+        { name: { startsWith: "Pernil Suino", mode: "insensitive" } },
+        { name: { startsWith: "Bisteca Suína", mode: "insensitive" } },
+        { name: { startsWith: "Bisteca Suina", mode: "insensitive" } },
+        { name: { startsWith: "Copa Lombo", mode: "insensitive" } },
+
+        // Bovinos
+        { name: { startsWith: "Alcatra", mode: "insensitive" } },
+        { name: { startsWith: "Coxão Mole", mode: "insensitive" } },
+        { name: { startsWith: "Coxao Mole", mode: "insensitive" } },
+        { name: { startsWith: "Coxão Duro", mode: "insensitive" } },
+        { name: { startsWith: "Coxao Duro", mode: "insensitive" } },
+        { name: { startsWith: "Patinho", mode: "insensitive" } },
+        { name: { startsWith: "Maminha", mode: "insensitive" } },
+        { name: { startsWith: "Picanha", mode: "insensitive" } },
+        { name: { startsWith: "Contrafilé", mode: "insensitive" } },
+        { name: { startsWith: "Contrafile", mode: "insensitive" } },
+        { name: { startsWith: "Acém", mode: "insensitive" } },
+        { name: { startsWith: "Acem", mode: "insensitive" } },
+        { name: { startsWith: "Paleta Bovina", mode: "insensitive" } },
+        { name: { startsWith: "Costela Bovina", mode: "insensitive" } },
+
+        // Pescados
+        { name: { startsWith: "Filé de Tilápia", mode: "insensitive" } },
+        { name: { startsWith: "File de Tilapia", mode: "insensitive" } },
+        { name: { startsWith: "Tilápia", mode: "insensitive" } },
+        { name: { startsWith: "Tilapia", mode: "insensitive" } },
+        { name: { startsWith: "Filé de Merluza", mode: "insensitive" } },
+        { name: { startsWith: "File de Merluza", mode: "insensitive" } },
+        { name: { startsWith: "Merluza", mode: "insensitive" } },
+        { name: { startsWith: "Salmão", mode: "insensitive" } },
+        { name: { startsWith: "Salmao", mode: "insensitive" } },
+        { name: { startsWith: "Pescada", mode: "insensitive" } },
+        { name: { startsWith: "Sardinha Inteira", mode: "insensitive" } },
       ],
     },
   },
+
   include: {
     product: true,
     store: true,
   },
-  orderBy: {
-    price: "asc",
-  },
-});
-const proteinas = await prisma.offer.findMany({
-  where: {
-    ...activeOfferWhere(),
-    product: {
-      category: "Proteínas",
-    },
-  },
-  include: {
-    product: true,
-    store: true,
-  },
+
   orderBy: { price: "asc" },
 });
+
+const [destaqueRadar, proteinas] = await Promise.all([
+  destaqueRadarPromise,
+  proteinasPromise,
+]);
 
 const nomeProduto = (nome: string) =>
   nome.toLowerCase();
@@ -306,6 +611,9 @@ const painelProteinas = [
           "instantane",
           "ração",
           "racao",
+          "linguiça",
+          "linguica",
+          "defumad",
         ])
       );
     }),
@@ -367,6 +675,9 @@ const painelProteinas = [
           "macarrao",
           "ração",
           "racao",
+          "linguiça",
+          "linguica",
+          "defumad",
         ])
       );
     }),
@@ -407,6 +718,7 @@ const painelProteinas = [
           "bolinho",
           "hambúrguer",
           "hamburguer",
+          "defumad",
         ])
       );
     }),
@@ -623,39 +935,49 @@ destaqueRadar.region.toLowerCase() !==
         </div>
 
 <p className="mt-4 text-sm text-slate-500">
-  Comparativo baseado nos itens de cesta básica cadastrados por região.
+  Comparativo baseado nos 10 grupos de alimentos da cesta básica de referência.
 </p>
 
 <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {rankingPorRegiao.map((item) => (
-  <div
-    key={item.region}
-    className="rounded-3xl border border-sky-200 bg-gradient-to-br from-sky-50 to-white p-5 shadow-lg transition-all hover:-translate-y-1 hover:shadow-xl"
-  >
-    <div className="inline-flex items-center rounded-full bg-sky-100 px-3 py-1 text-xs font-bold text-sky-700">
-      {item.region}
+  {rankingPorRegiao.map((item) => (
+    <div
+      key={item.region}
+      className="rounded-3xl border border-sky-200 bg-gradient-to-br from-sky-50 to-white p-5 shadow-lg transition-all hover:-translate-y-1 hover:shadow-xl"
+    >
+      <div className="inline-flex items-center rounded-full bg-sky-100 px-3 py-1 text-xs font-bold text-sky-700">
+        {item.region}
+      </div>
+
+      <div className="mt-2 text-lg font-bold text-slate-900">
+        {item.winner?.store}
+      </div>
+
+      <div className="mt-2 text-sm font-semibold text-slate-600">
+        {item.winner?.found} de {item.winner?.required} grupos encontrados
+      </div>
+
+      <div
+        className={`mt-3 inline-flex rounded-full px-3 py-1 text-xs font-bold ${
+          item.winner?.complete
+            ? "bg-emerald-100 text-emerald-700"
+            : "bg-amber-100 text-amber-700"
+        }`}
+      >
+        {item.winner?.complete ? "Cesta completa" : "Cesta parcial"}
+      </div>
+
+      <div className="mt-3 text-xs font-bold uppercase tracking-wide text-slate-500">
+        {item.winner?.complete ? "Total da cesta" : "Total parcial"}
+      </div>
+
+      <div className="mt-1 text-2xl font-extrabold text-green-700">
+        {item.winner?.total.toLocaleString("pt-BR", {
+          style: "currency",
+          currency: "BRL",
+        })}
+      </div>
     </div>
-
-    <div className="mt-2 text-lg font-bold text-slate-900">
-  {item.winner?.store}
-</div>
-
-<div className="mt-1 text-sm font-semibold text-slate-600">
-  {item.productName}
-</div>
-
-    <div className="mt-2 text-xs font-bold uppercase tracking-wide text-slate-500">
-  Total da cesta
-</div>
-
-<div className="mt-1 text-2xl font-extrabold text-green-700">
-  {item.winner?.total.toLocaleString("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  })}
-</div>
-  </div>
-))}
+  ))}
 
           {rankingPorRegiao.length === 0 && (
             <div className="rounded-2xl border bg-white p-5 text-slate-600 shadow-sm">

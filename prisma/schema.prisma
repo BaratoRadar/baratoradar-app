@@ -57,6 +57,12 @@ model Offer {
   @@index([productId])
   @@index([storeId])
   @@index([city])
+  @@index([region])
   @@index([productId, storeId])
   @@index([createdAt])
+
+  // Consultas de ofertas ativas do BaratoRadar
+  @@index([available, updatedAt])
+  @@index([available, updatedAt, price])
+  @@index([city, available, updatedAt])
 }

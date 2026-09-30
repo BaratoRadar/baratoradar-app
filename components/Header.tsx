@@ -9,7 +9,7 @@ export default function Header() {
             src="/baratoradar-logo.png"
             alt="BaratoRadar"
             style={{
-              width: "180px",
+              width: "205px",
               height: "auto",
               display: "block",
             }}
