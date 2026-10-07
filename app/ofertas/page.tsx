@@ -173,31 +173,34 @@ export default async function OfertasPage({
   const categoria = (sp?.categoria ?? "").trim();
   const cidade = (sp?.cidade ?? "").trim();
   const regiao = (sp?.regiao ?? "").trim();
-const offers = await prisma.offer.findMany({
-  where: {
-        ...activeOfferWhere(),
+  const categoriaFiltro = categoria
+    ? filtroCategoriaPrisma(categoria)
+    : undefined;
 
-    ...(categoria
-      ? {
-          product: filtroCategoriaPrisma(categoria),
-        }
-      : {}),
-
+  const productWhere = {
+    ...(categoriaFiltro ?? {}),
     ...(busca
       ? {
-          product: {
-            name: {
-              contains: busca,
-              mode: "insensitive",
+          AND: [
+            ...(categoriaFiltro ? [categoriaFiltro] : []),
+            {
+              name: {
+                contains: busca,
+                mode: "insensitive" as const,
+              },
             },
-          },
+          ],
         }
       : {}),
+  };
+
+  const whereBase = {
+    ...activeOfferWhere(),
     ...(cidade
       ? {
           city: {
             equals: cidade,
-            mode: "insensitive",
+            mode: "insensitive" as const,
           },
         }
       : {}),
@@ -205,37 +208,71 @@ const offers = await prisma.offer.findMany({
       ? {
           region: {
             equals: regiao,
-            mode: "insensitive",
+            mode: "insensitive" as const,
           },
         }
       : {}),
-  },
-  include: {
-    product: true,
-    store: true,
-  },
-  orderBy: {
-    updatedAt: "desc",
-  },
-  take: 100,
-});
-  const filteredOffers = categoria
-    ? offers.filter((offer) =>
-        produtoDaCategoria(
-          offer.product.name,
-          categoria
-        )
-      )
-    : offers;
+    ...(categoria || busca
+      ? { product: productWhere }
+      : {}),
+  };
+
+  const lojasAtivas = await prisma.offer.groupBy({
+    by: ["storeId"],
+    where: whereBase,
+    _count: { _all: true },
+  });
+
+  const limitePorLoja =
+    cidade === "São Paulo" ? 50 : 10;
+
+  const ofertasPorLoja = await Promise.all(
+    lojasAtivas.map(async (loja) => {
+      const candidatas = await prisma.offer.findMany({
+        where: {
+          ...whereBase,
+          storeId: loja.storeId,
+        },
+        include: {
+          product: true,
+          store: true,
+        },
+        orderBy: {
+          updatedAt: "desc",
+        },
+        take: limitePorLoja * 5,
+      });
+
+      const validas = categoria
+        ? candidatas.filter((offer) =>
+            produtoDaCategoria(
+              offer.product.name,
+              categoria
+            )
+          )
+        : candidatas;
+
+      return validas.slice(0, limitePorLoja);
+    })
+  );
+
+  const offers = ofertasPorLoja
+    .flat()
+    .sort(
+      (a, b) =>
+        (b.updatedAt?.getTime() ?? 0) -
+        (a.updatedAt?.getTime() ?? 0)
+    )
+    .slice(0, 100);
 
   const uniqueOffers = Array.from(
-  new Map(
-    filteredOffers.map((offer) => [
-      `${offer.product.name.toLowerCase()}-${offer.store.name.toLowerCase()}-${offer.price}-${offer.city?.toLowerCase()}-${offer.region?.toLowerCase()}`,
-      offer,
-    ])
-  ).values()
-);
+    new Map(
+      offers.map((offer) => [
+        `${offer.product.name.toLowerCase()}-${offer.store.name.toLowerCase()}-${offer.price}-${offer.city?.toLowerCase()}-${offer.region?.toLowerCase()}`,
+        offer,
+      ])
+    ).values()
+  );
 
   const nomesCategorias: Record<string, string> = {
     leite: "Leite",
