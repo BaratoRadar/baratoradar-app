@@ -87,6 +87,74 @@ function produtoDaCategoria(
   return false;
 }
 
+function filtroCategoriaPrisma(categoria: string) {
+  const c = normalizarNome(categoria);
+
+  const nomes: Record<string, string[]> = {
+    leite: ["Leite"],
+    arroz: ["Arroz"],
+    feijao: ["Feijão", "Feijao"],
+    oleo: ["Óleo", "Oleo"],
+    ovos: ["Ovo ", "Ovos "],
+    frango: [
+      "Frango Inteiro",
+      "Coxa de Frango",
+      "Coxa Frango",
+      "Sobrecoxa",
+      "Peito de Frango",
+      "Peito Frango",
+      "Filé de Peito",
+      "File de Peito",
+      "Filezinho de Sassami",
+      "Sassami",
+      "Asa de Frango",
+      "Asa Frango",
+      "Coxinha da Asa",
+    ],
+    carne: [
+      "Carne Bovina",
+      "Carne Moída",
+      "Carne Moida",
+      "Acém",
+      "Acem",
+      "Alcatra",
+      "Contrafilé",
+      "Contrafile",
+      "Contra Filé",
+      "Contra File",
+      "Coxão Mole",
+      "Coxao Mole",
+      "Coxão Duro",
+      "Coxao Duro",
+      "Patinho",
+      "Picanha",
+      "Maminha",
+      "Filé Mignon",
+      "File Mignon",
+      "Lagarto",
+      "Paleta Bovina",
+      "Músculo Bovino",
+      "Musculo Bovino",
+      "Costela Bovina",
+      "Peito Bovino",
+    ],
+    cafe: ["Café", "Cafe"],
+  };
+
+  const termos = nomes[c];
+
+  if (!termos) return undefined;
+
+  return {
+    OR: termos.map((termo) => ({
+      name: {
+        startsWith: termo,
+        mode: "insensitive" as const,
+      },
+    })),
+  };
+}
+
 type SP = {
   busca?: string;
   categoria?: string;
@@ -108,6 +176,13 @@ export default async function OfertasPage({
 const offers = await prisma.offer.findMany({
   where: {
         ...activeOfferWhere(),
+
+    ...(categoria
+      ? {
+          product: filtroCategoriaPrisma(categoria),
+        }
+      : {}),
+
     ...(busca
       ? {
           product: {
@@ -140,10 +215,9 @@ const offers = await prisma.offer.findMany({
     store: true,
   },
   orderBy: {
-  product: {
-    name: "asc",
+    updatedAt: "desc",
   },
-},
+  take: 100,
 });
   const filteredOffers = categoria
     ? offers.filter((offer) =>
@@ -163,15 +237,47 @@ const offers = await prisma.offer.findMany({
   ).values()
 );
 
+  const nomesCategorias: Record<string, string> = {
+    leite: "Leite",
+    arroz: "Arroz",
+    feijao: "Feijão",
+    oleo: "Óleo",
+    ovos: "Ovos",
+    frango: "Frango",
+    carne: "Carne",
+    cafe: "Café",
+  };
+
+  const categoriaNormalizada =
+    normalizarNome(categoria);
+
+  const categoriaLabel =
+    nomesCategorias[categoriaNormalizada] ??
+    categoria;
+
   return (
     <main className="mx-auto max-w-6xl px-4 py-10">
-      <h1 className="text-3xl font-extrabold text-slate-900">Ofertas</h1>
+      <h1 className="text-3xl font-extrabold text-slate-900">
+        {categoria
+          ? `Ofertas de ${categoriaLabel}`
+          : "Ofertas"}
+      </h1>
 
       <p className="mt-2 text-slate-600">
-        Lista de ofertas cadastradas no BaratoRadar.
+        {categoria
+          ? `Compare preços de ${categoriaLabel.toLowerCase()} encontrados pelo BaratoRadar.`
+          : "Lista das ofertas mais recentes encontradas pelo BaratoRadar."}
       </p>
 
       <form method="get" className="mt-6 flex flex-wrap gap-2">
+        {categoria && (
+          <input
+            type="hidden"
+            name="categoria"
+            value={categoria}
+          />
+        )}
+
         <input
           name="busca"
           defaultValue={busca}
@@ -228,7 +334,7 @@ const offers = await prisma.offer.findMany({
       </form>
 
       <p className="mt-4 text-xs text-slate-500">
-        Cidade: {cidade || "Todas"} | Região: {regiao || "Todas"} | Ofertas encontradas: {uniqueOffers.length}
+        Categoria: {categoria ? categoriaLabel : "Todas"} | Cidade: {cidade || "Todas"} | Região: {regiao || "Todas"} | Ofertas encontradas: {uniqueOffers.length}
       </p>
 
       <div className="mt-6 overflow-hidden rounded-2xl border bg-white shadow-sm">
