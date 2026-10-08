@@ -160,6 +160,7 @@ type SP = {
   categoria?: string;
   cidade?: string;
   regiao?: string;
+  pagina?: string;
 };
 
 export default async function OfertasPage({
@@ -173,6 +174,11 @@ export default async function OfertasPage({
   const categoria = (sp?.categoria ?? "").trim();
   const cidade = (sp?.cidade ?? "").trim();
   const regiao = (sp?.regiao ?? "").trim();
+
+  const pagina = Math.max(
+    1,
+    Number.parseInt(sp?.pagina ?? "1", 10) || 1
+  );
   const categoriaFiltro = categoria
     ? filtroCategoriaPrisma(categoria)
     : undefined;
@@ -226,42 +232,80 @@ export default async function OfertasPage({
   const limitePorLoja =
     cidade === "São Paulo" ? 50 : 10;
 
+  const limitePorPaginaLoja = limitePorLoja;
+  const alvoPorLoja = pagina * limitePorPaginaLoja + 1;
+
   const ofertasPorLoja = await Promise.all(
     lojasAtivas.map(async (loja) => {
-      const candidatas = await prisma.offer.findMany({
-        where: {
-          ...whereBase,
-          storeId: loja.storeId,
-        },
-        include: {
-          product: true,
-          store: true,
-        },
-        orderBy: {
-          updatedAt: "desc",
-        },
-        take: limitePorLoja * 5,
-      });
+      const validas: Awaited<
+        ReturnType<typeof prisma.offer.findMany<{
+          include: { product: true; store: true };
+        }>>
+      > = [];
 
-      const validas = categoria
-        ? candidatas.filter((offer) =>
+      let deslocamento = 0;
+      const lote = 100;
+
+      while (validas.length < alvoPorLoja) {
+        const candidatas = await prisma.offer.findMany({
+          where: {
+            ...whereBase,
+            storeId: loja.storeId,
+          },
+          include: {
+            product: true,
+            store: true,
+          },
+          orderBy: [
+            { updatedAt: "desc" },
+            { id: "asc" },
+          ],
+          skip: deslocamento,
+          take: lote,
+        });
+
+        if (candidatas.length === 0) break;
+
+        deslocamento += candidatas.length;
+
+        for (const oferta of candidatas) {
+          if (
+            !categoria ||
             produtoDaCategoria(
-              offer.product.name,
+              oferta.product.name,
               categoria
             )
-          )
-        : candidatas;
+          ) {
+            validas.push(oferta);
+          }
+        }
 
-      return validas.slice(0, limitePorLoja);
+        if (candidatas.length < lote) break;
+      }
+
+      const inicio = (pagina - 1) * limitePorPaginaLoja;
+
+      return {
+        ofertas: validas.slice(
+          inicio,
+          inicio + limitePorPaginaLoja
+        ),
+        temMais: validas.length > inicio + limitePorPaginaLoja,
+      };
     })
   );
 
+  const temProximaPagina = ofertasPorLoja.some(
+    (loja) => loja.temMais
+  );
+
   const offers = ofertasPorLoja
-    .flat()
+    .flatMap((loja) => loja.ofertas)
     .sort(
       (a, b) =>
         (b.updatedAt?.getTime() ?? 0) -
-        (a.updatedAt?.getTime() ?? 0)
+        (a.updatedAt?.getTime() ?? 0) ||
+        a.id.localeCompare(b.id)
     )
     .slice(0, 100);
 
@@ -273,6 +317,19 @@ export default async function OfertasPage({
       ])
     ).values()
   );
+
+  const urlPagina = (numero: number) => {
+    const params = new URLSearchParams();
+
+    if (categoria) params.set("categoria", categoria);
+    if (busca) params.set("busca", busca);
+    if (cidade) params.set("cidade", cidade);
+    if (regiao) params.set("regiao", regiao);
+
+    params.set("pagina", String(numero));
+
+    return `/ofertas?${params.toString()}`;
+  };
 
   const nomesCategorias: Record<string, string> = {
     leite: "Leite",
@@ -431,6 +488,37 @@ export default async function OfertasPage({
           </tbody>
         </table>
       </div>
+
+      <nav
+        aria-label="Paginação de ofertas"
+        className="mt-6 flex items-center justify-between gap-4"
+      >
+        {pagina > 1 ? (
+          <a
+            href={urlPagina(pagina - 1)}
+            className="rounded-xl border border-slate-300 bg-white px-5 py-3 font-semibold text-slate-700 hover:bg-slate-50"
+          >
+            ← Anterior
+          </a>
+        ) : (
+          <span />
+        )}
+
+        <span className="text-sm font-semibold text-slate-600">
+          Página {pagina}
+        </span>
+
+        {temProximaPagina ? (
+          <a
+            href={urlPagina(pagina + 1)}
+            className="rounded-xl bg-green-700 px-5 py-3 font-semibold text-white hover:bg-green-800"
+          >
+            Próxima →
+          </a>
+        ) : (
+          <span />
+        )}
+      </nav>
     </main>
   );
 }
